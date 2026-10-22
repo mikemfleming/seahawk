@@ -20,6 +20,9 @@ test('Edge adapter filters private records before signing photos and enforces or
       return { origin: process.env.APP_ORIGIN, role: archivist ? 'archivist' : 'family', person: null, isArchivist: () => archivist, requireArchivist: () => { if (!archivist) throw new AppError('Forbidden', 401); } };
     } });
     const request = (path, origin = process.env.APP_ORIGIN, method = 'GET') => handler(new Request('https://project.supabase.co/functions/v1/ships-log' + path, { method, headers: { Origin: origin, Cookie: 'untrusted=1' } }));
+    const shortPath = await handler(new Request('https://project.supabase.co/ships-log/api/family', { headers: { Origin: process.env.APP_ORIGIN } }));
+    assert.equal(shortPath.status, 200);
+    signed.length = 0;
     const preflight = await request('/api/family', undefined, 'OPTIONS');
     assert.equal(preflight.status, 204);
     assert.equal(preflight.headers.get('access-control-allow-origin'), process.env.APP_ORIGIN);

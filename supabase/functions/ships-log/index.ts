@@ -1,14 +1,18 @@
-import process from 'node:process';
-process.env.SHIPS_LOG_EDGE = '1';
-process.env.SUPABASE_SECRET_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-process.env.SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_ANON_KEY;
-let handler;
+let handler: ((request: Request) => Promise<Response>) | undefined;
 Deno.serve(async request => {
   try {
-    if (!handler) { const { createEdgeHandler } = await import('../../../lib/edge-handler.js'); handler = createEdgeHandler(); }
+    if (!handler) {
+      const env = {
+        ...Deno.env.toObject(),
+        SUPABASE_SECRET_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
+        SUPABASE_PUBLISHABLE_KEY: Deno.env.get('SUPABASE_ANON_KEY'),
+      };
+      const { createEdgeHandler } = await import('../../../lib/edge-handler.js');
+      handler = createEdgeHandler({ env });
+    }
     return await handler(request);
   } catch (error) {
     console.error('API initialization error', error);
-    return Response.json({ error: String(error) }, { status: 503 });
+    return Response.json({ error: 'The API is temporarily unavailable.' }, { status: 503 });
   }
 });

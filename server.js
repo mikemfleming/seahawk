@@ -51,23 +51,24 @@ async function readBody(req) {
 }
 
 export function createApp(options = {}) {
-  const dataDir = options.dataDir ?? process.env.SHIPS_LOG_DATA ?? join(ROOT, 'data');
-  const model = options.model ?? process.env.OPENAI_MODEL ?? 'gpt-4.1';
-  const apiKey = options.apiKey ?? process.env.OPENAI_API_KEY;
+  const env = options.env ?? process.env;
+  const dataDir = options.dataDir ?? env.SHIPS_LOG_DATA ?? join(ROOT, 'data');
+  const model = options.model ?? env.OPENAI_MODEL ?? 'gpt-4.1';
+  const apiKey = options.apiKey ?? env.OPENAI_API_KEY;
   // Filesystem mode exists only for isolated integration tests. Production fails closed.
   const testing = Boolean(options.dataDir || options.store);
   const localStore = testing ? options.store ?? new ArchiveStore(dataDir) : null;
-  const admin = testing ? null : options.admin ?? adminClient();
+  const admin = testing ? null : options.admin ?? adminClient(env);
   const generateReading = options.generateReading ?? createReadingGenerator({ apiKey, model });
   const lookupPlace = options.lookupPlace ?? createPlaceLookup();
   const transcribe = options.transcribe ?? createTranscriber({ apiKey, model });
   const localAccess = testing ? createAccess(options.archivistPassword || randomBytes(24).toString('base64url')) : null;
   const server = (options.createServer ?? createServer)(async (req, res) => {
     try {
-      if (process.env.APP_ORIGIN?.startsWith('https:')) res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+      if (env.APP_ORIGIN?.startsWith('https:')) res.setHeader('Strict-Transport-Security', 'max-age=31536000');
       res.setHeader('Referrer-Policy', 'no-referrer');
       if (options.bearerOnly && req.headers.cookie) delete req.headers.cookie;
-      const access = localAccess || await (options.accessProvider ?? requestAccess)(req, res, admin);
+      const access = localAccess || await (options.accessProvider ?? requestAccess)(req, res, admin, env);
       const store = localStore || await loadSupabaseStore(admin);
       const person = () => testing ? getContributor(req, store.read()) : access.person;
       const respond = async (...args) => { await store.commit?.(); if (options.transformResponse && args[1] < 400) args[2] = await options.transformResponse(args[2], admin); return send(...args); };
@@ -180,7 +181,7 @@ export function createApp(options = {}) {
   return server;
 }
 
-if (!process.env.SHIPS_LOG_EDGE && process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (typeof Deno === 'undefined' && !process.env.SHIPS_LOG_EDGE && process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const validArgs = args.length === 0 || (args.length === 2 && args[0] === '--port');
   const port = Number(args[1] ?? process.env.PORT ?? 8000);
