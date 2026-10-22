@@ -661,3 +661,14 @@ test('confirmed reading corrections persist, reach generation, and retain the fa
   const next = await request(`/api/entries/${entry.id}`, { reading_corrections: [], revision: 1 });
   assert.deepEqual(next.value.revisions[1].record.reading_corrections, corrections);
 });
+
+test('weekly radio charts are available publicly without changing archive records', async () => {
+  const before = store.read();
+  const dates = [];
+  const request = await start({ signedIn: false, lookupRadio: async date => { dates.push(date); return { status: 'no_chart', songs: [] }; } });
+  const result = await request('/api/radio?date=1995-03-06');
+  assert.equal(result.status, 200);
+  assert.deepEqual(result.value, { status: 'no_chart', songs: [] });
+  assert.deepEqual(dates, ['1995-03-06']);
+  assert.deepEqual(store.read(), before);
+});

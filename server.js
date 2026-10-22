@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { createRadioLookup } from './lib/radio.js';
 import { publicPage, readTraffic } from './lib/analytics.js';
 import { observeRequest } from './lib/observability.js';
 import { Buffer } from 'node:buffer';
@@ -62,6 +63,7 @@ export function createApp(options = {}) {
   const localStore = testing ? options.store ?? new ArchiveStore(dataDir) : null;
   const admin = testing ? null : options.admin ?? adminClient(env);
   const generateReading = options.generateReading ?? createReadingGenerator({ apiKey, model });
+  const lookupRadio = options.lookupRadio ?? createRadioLookup();
   const lookupPlace = options.lookupPlace ?? createPlaceLookup();
   const transcribe = options.transcribe ?? createTranscriber({ apiKey, model });
   const localAccess = testing ? createAccess(options.archivistPassword || randomBytes(24).toString('base64url')) : null;
@@ -76,6 +78,10 @@ export function createApp(options = {}) {
         access.requireArchivist(req);
         if (testing) return send(res, 200, { rows: [], timezone: 'UTC', days: 30 });
         return send(res, 200, await timed('database', () => readTraffic(admin)));
+      }
+      if (req.method === 'GET' && req.url.split('?')[0] === '/api/radio') {
+        const date = new URL(req.url, 'http://localhost').searchParams.get('date');
+        return send(res, 200, await lookupRadio(date));
       }
       const store = localStore || await timed('database', () => loadSupabaseStore(admin));
       const person = () => testing ? getContributor(req, store.read()) : access.person;
