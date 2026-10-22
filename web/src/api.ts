@@ -16,7 +16,7 @@ export async function api<T>(path: string, body?: unknown, signal?: AbortSignal)
       if (!result.error) { const logout = await cloudAuth.auth.signOut({ scope: 'global' }); if (logout.error) throw new Error('Password changed, but sign-out could not be confirmed. Sign out and try again.'); }
     }
     if (result.error) throw new Error(path === '/api/session' ? 'Unable to sign in. Check your email and password.' : 'Unable to complete the request. Check your details and try again.');
-    return { message: path === '/api/signup' ? 'Your crew request has been submitted. The archivist must approve your account before you can contribute.' : path === '/api/change-password' ? 'Password changed. Sign in again.' : undefined } as T;
+    return { message: path === '/api/signup' ? 'Your crew request has been submitted. Mike must approve your account before you can contribute.' : path === '/api/change-password' ? 'Password changed. Sign in again.' : undefined } as T;
   }
   const started = performance.now();
   let response: Response | undefined;
