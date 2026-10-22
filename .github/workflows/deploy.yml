@@ -68,7 +68,7 @@ jobs:
         run: pnpm build
         env:
           VITE_PAGES: 'true'
-          VITE_BASE_PATH: /ships-log/
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_EDGE_API_URL: ${{ vars.VITE_EDGE_API_URL }}

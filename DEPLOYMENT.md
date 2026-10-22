@@ -26,7 +26,7 @@ Repository variables (public configuration):
 - `VITE_SUPABASE_PUBLISHABLE_KEY` (the publishable/anon key, never the secret/service-role key)
 - `VITE_EDGE_API_URL`: `https://PROJECT.supabase.co/functions/v1/ships-log`
 
-Pages uses GitHub Actions as its build source. The repository name is `ships-log`, so Vite builds with base `/ships-log/`. Production routes use hashes, such as `/ships-log/#/workspace`, which work on reload without server rewrites. Change `VITE_BASE_PATH` in the workflow if the repository path changes.
+Pages uses GitHub Actions as its build source. The repository name is `seahawk`, so Vite builds with base `/seahawk/`. The workflow derives this path from the repository name. Production routes use hashes, such as `/seahawk/#/workspace`, which work on reload without server rewrites. Change `VITE_BASE_PATH` in the workflow if the repository path changes.
 
 ## Supabase configuration
 
@@ -46,7 +46,7 @@ Production uses the Supabase browser SDK's session storage and bearer tokens, av
 
 Copy `.env.example` to `.env` and supply server-side Supabase credentials. `pnpm build && pnpm start` serves the app at `http://127.0.0.1:8000` with same-origin cookies. Do not set VITE_PAGES/VITE_EDGE_API_URL for this mode. `pnpm test` requires no real database or archive.
 
-For a production frontend build, set the VITE_* variables listed above plus `VITE_PAGES=true` and `VITE_BASE_PATH=/ships-log/`. The browser bundle must never contain OPENAI_API_KEY or SUPABASE_SECRET_KEY.
+For a production frontend build, set the VITE_* variables listed above plus `VITE_PAGES=true` and `VITE_BASE_PATH=/seahawk/`. The browser bundle must never contain OPENAI_API_KEY or SUPABASE_SECRET_KEY.
 
 ## Data and secret protection
 
