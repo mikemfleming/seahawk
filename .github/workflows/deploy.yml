@@ -1,0 +1,90 @@
+name: Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: production
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/check-secrets.js
+      - run: pnpm test
+  backend:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Apply migrations and deploy API
+        run: |
+          pnpm exec supabase link --project-ref "$SUPABASE_PROJECT_REF" --yes
+          pnpm exec supabase db push --yes
+          pnpm exec supabase functions deploy ships-log --project-ref "$SUPABASE_PROJECT_REF" --use-api
+      - name: Verify production API before frontend release
+        run: node scripts/smoke-edge.js
+      - name: Function diagnostics on failure
+        if: failure()
+        run: node scripts/edge-logs.js
+  build:
+    needs: backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/configure-pages@v5
+      - name: Build static frontend with public configuration only
+        run: pnpm build
+        env:
+          VITE_PAGES: 'true'
+          VITE_BASE_PATH: /ships-log/
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_EDGE_API_URL: ${{ vars.VITE_EDGE_API_URL }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+  pages:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish frontend
+        id: deployment
+        uses: actions/deploy-pages@v4

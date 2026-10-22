@@ -1,0 +1,38 @@
+{
+  "name": "ships-log",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A Supabase-backed family fishing archive",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "vite",
+    "dev:server": "node --watch --env-file-if-exists=.env server.js",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "test": "tsc --noEmit && vite build && node --test",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "db:migrate": "node --env-file-if-exists=.env scripts/migrate-to-supabase.js",
+    "archivist": "node --env-file-if-exists=.env scripts/promote-archivist.js",
+    "check:secrets": "node scripts/check-secrets.js"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "supabase": "^2.121.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.0"
+  }
+}
