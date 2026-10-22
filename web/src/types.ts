@@ -95,7 +95,14 @@ export const statusLabels: Record<ReviewStatus, string> = {
   ready_to_share: 'Ready to share',
 };
 
-export const dateLabel = (entry: Entry) => entry.date_as_written || 'Undated passage';
+const entryDateFormatter = new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+export function dateLabel(entry: Pick<Entry, 'date' | 'date_as_written'>) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
+    const date = new Date(`${entry.date}T00:00:00Z`);
+    if (!Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === entry.date) return entryDateFormatter.format(date);
+  }
+  return entry.date_as_written || 'Undated passage';
+}
 
 export type ContributionKind = 'memory' | 'clarification' | 'identification' | 'photo';
 export type ContributionStatus = 'pending' | 'approved' | 'declined';

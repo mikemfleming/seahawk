@@ -23,7 +23,7 @@ export function EntryDetail({ entry, pages, onEdit, onScan, archivist = false, o
     <EntryFacts entry={entry} archivist={archivist} />
     {entry.uncertainties.length > 0 && <section className="review-note entry-questions" aria-labelledby="entry-questions-title"><strong id="entry-questions-title">DETAILS TO CLARIFY</strong><ul>{entry.uncertainties.map((text, i) => <li key={i}><span>{text}</span>{onContribute && <button className="question-link" onClick={() => onContribute({ kind: 'clarification', subject: text, prompt: text })}>Clarify this detail ↗</button>}</li>)}</ul></section>}
 
-    {!archivist && <details className="about-entry"><summary>About this entry</summary><p>Archive reference: {entry.id}</p><p>Transcription: {entry.status === 'first_pass' ? 'Draft, awaiting checking' : 'Checked against the original'}.</p><p>Heading as written: {dateLabel(entry)}.</p>{entry.date && <p>Interpreted date: {entry.date} ({entry.date_certainty}).</p>}<p>Source: {pages.map(page => page.label).join(', ')}. Bracketed readings are uncertain.</p></details>}
+    {!archivist && <details className="about-entry"><summary>About this entry</summary><p>Archive reference: {entry.id}</p><p>Transcription: {entry.status === 'first_pass' ? 'Draft, awaiting checking' : 'Checked against the original'}.</p><p>Heading as written: {entry.date_as_written || 'Undated passage'}.</p>{entry.date && <p>Interpreted date: {entry.date} ({entry.date_certainty}).</p>}<p>Source: {pages.map(page => page.label).join(', ')}. Bracketed readings are uncertain.</p></details>}
     </div>
   </>;
 }

@@ -1,3 +1,4 @@
+import { dateLabel } from '../types';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { api, errorMessage, fileDataUrl } from '../api';
 import { type ContributionKind, type ContributionRequest, type Entry, type Contributor } from '../types';
@@ -48,7 +49,7 @@ export function ContributionForm({ entry, request, onClose, contributor, onSubmi
   return <Modal id="contribution-dialog" titleId="contribution-title" onClose={onClose} busy={busy}>
     <div className="dialog-heading"><div><p className="eyebrow">CONTRIBUTE TO THIS ENTRY</p><h2 id="contribution-title">{receipt ? 'Submitted for review' : titles[kind]}</h2></div><button className="close" onClick={onClose} disabled={busy} aria-label="Close">×</button></div>
     {receipt ? <div className="submission-success" role="status"><span className="success-mark">✓</span><p><strong>{author}, your contribution is saved.</strong></p><p>The archivist will review it before it appears on “{entry.title}.”</p><p className="hint">You can return to this submission from “Your contributions” whenever you sign in to your crew account.</p><p className="hint">Reference: {receipt}</p><button className="outlined wide" onClick={onViewMine}>View your contributions</button><button className="primary wide" onClick={onClose}>Back to the entry</button></div> : <form onSubmit={submit}>
-      <p className="contribution-context">For <strong>{entry.title}</strong> · {entry.date_as_written || 'Undated passage'}</p>
+      <p className="contribution-context">For <strong>{entry.title}</strong> · {dateLabel(entry)}</p>
       {request.prompt && <p className="contribution-prompt">{request.prompt}</p>}<fieldset disabled={busy}>
         <label className="field">Your name<input value={author} onChange={event => setAuthor(event.target.value)} autoComplete="name" readOnly={contributor?.invited} required maxLength={120} placeholder="How should we credit you?" /></label>
         {kind === 'identification' && <><label className="field">Who are you identifying?<input value={subject} onChange={event => setSubject(event.target.value)} required maxLength={500} placeholder="e.g. The name written as [Patricia?]" /></label><label className="field">Suggested name<input value={name} onChange={event => setName(event.target.value)} required maxLength={200} placeholder="Their full name or familiar nickname" /></label></>}
