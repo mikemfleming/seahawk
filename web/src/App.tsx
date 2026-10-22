@@ -1,7 +1,7 @@
 import { Diagnostics } from './components/Diagnostics';
 import { recordNotebookReady } from './diagnostics';
 import { CrewRequests } from './components/CrewRequests';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, errorMessage } from './api';
 import { dateLabel, visibilityLabels, type Archive, type Config, type Contribution, type ContributionRequest, type Entry, type ImportResult, type ReviewStatus, type MyContributions } from './types';
 import { Navigation, Link, useNavigation, pageHref } from './navigation';
@@ -53,6 +53,15 @@ export function App() {
     const frame = requestAnimationFrame(recordNotebookReady);
     return () => cancelAnimationFrame(frame);
   }, [archive, workspace]);
+  const lastTrackedPage = useRef('');
+  const publicPath = !workspace && !previewId ? route.page === 'home' ? '/' : route.page === 'atlas' ? '/atlas' : route.page === 'entry' && archive?.entries.some(item => item.id === route.id) ? `/entries/${route.id}` : '' : '';
+  useEffect(() => {
+    if (!archive || !publicPath) { lastTrackedPage.current = ''; return; }
+    if (lastTrackedPage.current === publicPath) return;
+    lastTrackedPage.current = publicPath;
+    // Best effort; no analytics identifiers, retry queue or persistent tracking.
+    void api('/api/page-view', { page: publicPath }).catch(() => {});
+  }, [archive, publicPath]);
   useEffect(() => { setContributing(null); }, [route.path]);
   useEffect(() => { if (!message) return; const timer = setTimeout(() => setMessage(''), 6500); return () => clearTimeout(timer); }, [message]);
   const contributions = archive?.contributions || [];

@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { publicPage, readTraffic } from './lib/analytics.js';
 import { observeRequest } from './lib/observability.js';
 import { Buffer } from 'node:buffer';
 import { isAllowedOrigin } from './lib/origin.js';
@@ -71,6 +72,11 @@ export function createApp(options = {}) {
       res.setHeader('Referrer-Policy', 'no-referrer');
       if (options.bearerOnly && req.headers.cookie) delete req.headers.cookie;
       const access = localAccess || await timed('auth', () => (options.accessProvider ?? requestAccess)(req, res, admin, env));
+      if (req.method === 'GET' && req.url.split('?')[0] === '/api/analytics') {
+        access.requireArchivist(req);
+        if (testing) return send(res, 200, { rows: [], timezone: 'UTC', days: 30 });
+        return send(res, 200, await timed('database', () => readTraffic(admin)));
+      }
       const store = localStore || await timed('database', () => loadSupabaseStore(admin));
       const person = () => testing ? getContributor(req, store.read()) : access.person;
       const respond = async (...args) => { await timed('commit', () => store.commit?.()); if (options.transformResponse && args[1] < 400) args[2] = await timed('photos', () => options.transformResponse(args[2], admin)); return send(...args); };
@@ -124,6 +130,14 @@ export function createApp(options = {}) {
         throw new AppError('Cross-origin writes are not permitted.', 403);
       }
       const body = await readBody(req);
+      if (path === '/api/page-view') {
+        const page = publicPage(body.page, store.read());
+        if (!testing) {
+          const { error } = await timed('analytics', () => admin.rpc('record_page_view', { page_path: page }));
+          if (error) throw new AppError('Could not record page view.', 503);
+        }
+        return send(res, 200, { recorded: true });
+      }
       if (!testing && ['/api/session', '/api/signup', '/api/forgot-password', '/api/change-password', '/api/logout'].includes(path)) {
         limitAuth(req);
         const result = await authAction(path, body, access, admin);
