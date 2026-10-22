@@ -53,3 +53,13 @@ For a production frontend build, set the VITE_* variables listed above plus `VIT
 `.env`, `data/`, photographs, Supabase CLI temporary state, build output, caches, and dependencies are excluded from Git. Only synthetic records/image bytes are used in tests. `pnpm check:secrets` audits the Git index against private paths, known credential patterns, and local secret values. Install the pre-commit hook with `git config core.hooksPath .githooks`. The audit supplements review; it is not a guarantee against every possible secret format.
 
 Keep database and Storage backups independently of Git. CI never imports local archive data and never performs a database reset. Do not rewrite applied migrations: add a new forward migration. For a frontend rollback, redeploy a known-good commit; database rollback requires a separately reviewed forward repair migration. Backend and frontend changes should remain compatible during deployment.
+
+### Load diagnostics
+
+Before adding caching, sign in as archivist and expand **Load diagnostics** at the bottom of the page. It shows navigation-to-journal-render time, total API request count and the latest 30 request records. Measurements live only in this tab's memory. Reload to start a fresh visit; compare a first visit, a repeat visit, and a reload after publishing an edit. No caching has been enabled yet.
+
+API responses carry `X-Request-ID` and `Server-Timing` (also exposed to the cross-origin frontend). In browser DevTools, inspect `/api/config` and `/api/family` in Network. Backend phases are `auth`, `database`, `commit`, `photos`, and `total`; phases only appear when executed. Total excludes response transfer and platform startup before the handler starts. Browser request duration includes session lookup, network and JSON parsing. Journal timing approximates the first rendered entries, not when photos finish downloading.
+
+Search Supabase function logs for the request ID to find the structured `api_request` event: route category, method, status, cache state and phase durations. Queries, record IDs, identities, tokens, signed photo URLs, payloads and exception messages are excluded. Requests rejected by the gateway or CORS before the handler do not have this trace. Native Supabase Auth operations are outside these API measurements. Logs use Supabase's existing retention; no external telemetry service is added.
+
+Run `node scripts/performance-baseline.js` to measure three anonymous sequential config/journal loads. This prints only status, IDs and timings, never archive contents. It measures API loading, not full browser rendering, and does not force a cold start. Save outputs externally for comparison when caching is introduced; do not commit production diagnostics.

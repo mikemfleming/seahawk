@@ -1,4 +1,5 @@
 import process from 'node:process';
+import { observeRequest } from './lib/observability.js';
 import { Buffer } from 'node:buffer';
 import { isAllowedOrigin } from './lib/origin.js';
 import { resetMemberPassword } from './lib/password-help.js';
@@ -64,14 +65,15 @@ export function createApp(options = {}) {
   const transcribe = options.transcribe ?? createTranscriber({ apiKey, model });
   const localAccess = testing ? createAccess(options.archivistPassword || randomBytes(24).toString('base64url')) : null;
   const server = (options.createServer ?? createServer)(async (req, res) => {
+    const timed = observeRequest(req, res, options.requestLogger ?? (testing ? () => {} : undefined));
     try {
       if (env.APP_ORIGIN?.startsWith('https:')) res.setHeader('Strict-Transport-Security', 'max-age=31536000');
       res.setHeader('Referrer-Policy', 'no-referrer');
       if (options.bearerOnly && req.headers.cookie) delete req.headers.cookie;
-      const access = localAccess || await (options.accessProvider ?? requestAccess)(req, res, admin, env);
-      const store = localStore || await loadSupabaseStore(admin);
+      const access = localAccess || await timed('auth', () => (options.accessProvider ?? requestAccess)(req, res, admin, env));
+      const store = localStore || await timed('database', () => loadSupabaseStore(admin));
       const person = () => testing ? getContributor(req, store.read()) : access.person;
-      const respond = async (...args) => { await store.commit?.(); if (options.transformResponse && args[1] < 400) args[2] = await options.transformResponse(args[2], admin); return send(...args); };
+      const respond = async (...args) => { await timed('commit', () => store.commit?.()); if (options.transformResponse && args[1] < 400) args[2] = await timed('photos', () => options.transformResponse(args[2], admin)); return send(...args); };
       const path = req.url.split('?')[0];
       if (req.method === 'GET') {
         if (!testing && path === '/api/password-help') {
@@ -174,7 +176,7 @@ export function createApp(options = {}) {
     } catch (error) {
       if (res.destroyed) return;
       if (error instanceof AppError) return send(res, error.status, { error: error.message });
-      console.error('Operation failed:', error.name);
+      // Request metadata and status are logged by observeRequest; never log error payloads.
       send(res, 500, { error: 'Could not save changes. Existing archive records are unchanged.' });
     }
   });

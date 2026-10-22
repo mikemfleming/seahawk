@@ -26,3 +26,10 @@ a.outlined,a.primary{text-decoration:none;display:inline-block}nav a{height:100%
 
 /* Gallery: a broad photograph mount followed by a centered reading column. */
 .gallery-entry .entry-opening-scans{max-width:none;margin-bottom:34px}.gallery-entry .entry-opening-scans figure{background:#e6e2d7;padding:16px}.gallery-entry .entry-opening-scans .source-image{max-height:480px;border:0;box-shadow:none;background:transparent}.gallery-entry .entry-opening-scans figcaption{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px}.gallery-story,.gallery-entry .family-contributions{max-width:680px;margin-left:auto;margin-right:auto}.gallery-story .gallery-eyebrow{margin:0 0 12px}.gallery-story .story-title{margin-top:0}.gallery-story .family-reading{max-width:none}.gallery-story .facts{grid-template-columns:1fr 1fr}.gallery-story .transcript{font-size:20px;line-height:1.9}@media(max-width:650px){.gallery-entry .entry-opening-scans figure{padding:10px}.gallery-entry .entry-opening-scans .source-image{max-height:56vh}.gallery-entry .entry-opening-scans figcaption{font-size:10px}.gallery-story .facts{grid-template-columns:1fr}.gallery-story .transcript{font-size:18px}}
+
+.diagnostics { margin: 2rem auto; padding: 1rem; max-width: 1100px; border: 1px solid #d8d0c2; font-size: .85rem; }
+.diagnostics summary { cursor: pointer; font-weight: 600; }
+.diagnostics table { width: 100%; border-collapse: collapse; text-align: left; }
+.diagnostics th, .diagnostics td { padding: .5rem; vertical-align: top; border-bottom: 1px solid #d8d0c2; }
+.diagnostics code { font-size: .75rem; overflow-wrap: anywhere; }
+@media print { .diagnostics { display: none; } }

@@ -6,6 +6,9 @@ async function get(path, method = 'GET', from = origin) {
 }
 const config = await get('/api/config');
 assert.equal(config.status, 200, 'Edge config must be healthy before frontend release');
+assert.match(config.headers.get('x-request-id') || '', /^[a-f0-9-]{36}$/);
+assert.match(config.headers.get('server-timing') || '', /database;dur=/);
+assert.match(config.headers.get('access-control-expose-headers') || '', /Server-Timing/);
 assert.equal((await config.json()).role, 'family');
 const family = await get('/api/family'); assert.equal(family.status, 200);
 const archive = await family.json(); assert.ok(Array.isArray(archive.entries));

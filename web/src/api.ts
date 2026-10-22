@@ -1,3 +1,4 @@
+import { recordRequest } from './diagnostics';
 import { cloudApi, cloudAuth } from './cloud';
 export async function api<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
   if (cloudAuth && ['/api/session', '/api/signup', '/api/logout', '/api/change-password'].includes(path)) {
@@ -17,17 +18,21 @@ export async function api<T>(path: string, body?: unknown, signal?: AbortSignal)
     if (result.error) throw new Error(path === '/api/session' ? 'Unable to sign in. Check your email and password.' : 'Unable to complete the request. Check your details and try again.');
     return { message: path === '/api/signup' ? 'Your crew request has been submitted. The archivist must approve your account before you can contribute.' : path === '/api/change-password' ? 'Password changed. Sign in again.' : undefined } as T;
   }
-  const token = cloudAuth ? (await cloudAuth.auth.getSession()).data.session?.access_token : null;
-  const response = await fetch(cloudApi ? cloudApi + path : path, {
-    headers: { ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-    ...(body === undefined ? {} : {
-      method: 'POST', body: JSON.stringify(body),
-    }),
-    signal,
-  });
-  const value = await response.json();
-  if (!response.ok) throw new Error(value.error || 'Request failed.');
-  return value as T;
+  const started = performance.now();
+  let response: Response | undefined;
+  try {
+    const token = cloudAuth ? (await cloudAuth.auth.getSession()).data.session?.access_token : null;
+    response = await fetch(cloudApi ? cloudApi + path : path, {
+      headers: { ...(body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      ...(body === undefined ? {} : {
+        method: 'POST', body: JSON.stringify(body),
+      }),
+      signal,
+    });
+    const value = await response.json();
+    if (!response.ok) throw new Error(value.error || 'Request failed.');
+    return value as T;
+  } finally { recordRequest(path, response?.status || 0, started, response); }
 }
 
 export const errorMessage = (error: unknown) => error instanceof Error ? error.message : 'Something went wrong. Please try again.';
