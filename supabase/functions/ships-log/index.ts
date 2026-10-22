@@ -1,4 +1,5 @@
 import process from 'node:process';
+process.env.SHIPS_LOG_EDGE = '1';
 process.env.SUPABASE_SECRET_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 process.env.SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_ANON_KEY;
 let handler;

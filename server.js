@@ -180,7 +180,7 @@ export function createApp(options = {}) {
   return server;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (!process.env.SHIPS_LOG_EDGE && process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const args = process.argv.slice(2);
   const validArgs = args.length === 0 || (args.length === 2 && args[0] === '--port');
   const port = Number(args[1] ?? process.env.PORT ?? 8000);

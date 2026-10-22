@@ -1,4 +1,4 @@
-const sql = 'select timestamp, event_message from function_edge_logs order by timestamp desc limit 10';
+const sql = 'select timestamp, event_message from function_logs order by timestamp desc limit 10';
 const url = `https://api.supabase.com/v1/projects/${process.env.SUPABASE_PROJECT_REF}/analytics/endpoints/logs?sql=${encodeURIComponent(sql)}`;
 const response = await fetch(url, { headers: { Authorization: `Bearer ${process.env.SUPABASE_ACCESS_TOKEN}` }, signal: AbortSignal.timeout(30000) });
 const text = await response.text();
