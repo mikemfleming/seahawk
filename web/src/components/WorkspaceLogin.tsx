@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { api, errorMessage } from '../api';
+import { type ContributionKind } from '../types';
 import { Modal } from './Modal';
 type Mode = 'signin' | 'signup' | 'forgot' | 'password';
-export function WorkspaceLogin({ onClose, onSignedIn, initialMode = 'signin' }: { onClose: () => void; onSignedIn: () => Promise<void>; initialMode?: Mode }) {
+export function WorkspaceLogin({ onClose, onSignedIn, initialMode = 'signin', contributionKind }: { onClose: () => void; onSignedIn: () => Promise<void>; initialMode?: Mode; contributionKind?: ContributionKind }) {
   const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
@@ -25,6 +26,7 @@ export function WorkspaceLogin({ onClose, onSignedIn, initialMode = 'signin' }: 
   }
   return <Modal id="account-login" titleId="account-title" onClose={onClose} busy={busy}><form onSubmit={submit}>
     <div className="dialog-heading"><div><p className="eyebrow">SEAHAWK · FAMILY AND CREW</p><h2 id="account-title">{titles[mode]}</h2></div><button type="button" className="close" onClick={onClose} disabled={busy} aria-label="Close">×</button></div>
+    {mode === 'signin' && <p>{contributionKind ? `Sign in to ${contributionKind === 'clarification' ? 'clarify this detail' : contributionKind === 'identification' ? 'identify someone' : 'share a memory'}. After signing in, you’ll return to your contribution.` : 'Sign in to share memories, add photos, or help clarify details in the log.'} New here? Create an account below; the archivist must approve it before you can contribute.</p>}
     {mode === 'signup' && <><p>The archivist will verify your request and approve your account. Approved crew can share memories, photos, identifications, and clarifications for review.</p><label className="field">Your name<input autoComplete="name" value={name} onChange={e => setName(e.target.value)} maxLength={120} required /></label></>}
     {mode === 'forgot' && <p>Enter your account email to request help in the archivist workspace. Speak with the archivist in person to verify who you are and arrange a replacement password. No email will be sent.</p>}
     {mode !== 'password' && <label className="field">Email<input type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} required disabled={busy} /></label>}

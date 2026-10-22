@@ -37,3 +37,5 @@ a.outlined,a.primary{text-decoration:none;display:inline-block}nav a{height:100%
 .traffic table { width: 100%; border-collapse: collapse; text-align: left; }
 .traffic th, .traffic td { padding: .5rem; border-bottom: 1px solid #d8d0c2; }
 .traffic details { margin-top: 1rem; }
+
+.header-actions .sign-in-button{min-height:44px;padding:10px 16px;font-size:12px;white-space:nowrap;flex-shrink:0}
