@@ -17,6 +17,17 @@ test('invalid, duplicate, missing, and overlapping correction mappings are rejec
   assert.throws(() => prepareCorrections('A', [{ as_written: 'B', corrected: 'C' }]), /not found/);
   assert.throws(() => prepareCorrections('ABC', [{ as_written: 'ABC', corrected: 'D' }, { as_written: 'AB', corrected: 'E' }]), /overlap/);
 });
+test('an already applied correction does not block another confirmed name', async () => {
+  const generate = createReadingGenerator({ apiKey: 'test', fetchImpl: async (_url, options) => {
+    const text = JSON.parse(options.body).input.at(-1).content;
+    return Response.json({ status: 'completed', output: [{ content: [{ type: 'output_text', text: JSON.stringify({ reading_version: text }) }] }] });
+  } });
+  const result = await generate('[Cameron?] Pratt and Bill Hudspeth were with me.', [
+    { as_written: '[Cameron?]', corrected: 'Cameron' },
+    { as_written: '[Hedgpeth?]', corrected: 'Hudspeth' },
+  ]);
+  assert.equal(result.reading_version, 'Cameron Pratt and Bill Hudspeth were with me.');
+});
 test('generation restores confirmed corrections but still protects unresolved brackets', async () => {
   let sent;
   const generate = createReadingGenerator({ apiKey: 'test', fetchImpl: async (_url, options) => {
