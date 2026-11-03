@@ -1,78 +1,62 @@
-# The Ship’s Log
+# The Seahawk log
 
-A React + TypeScript family fishing journal with a Node.js API, Supabase Auth, Postgres, and private Supabase Storage. Requires Node.js 22.12+ and pnpm. Hosted Supabase is the selected backend. Production startup requires Supabase; there is no shared archivist password or filesystem fallback.
+A single static page: 73 displayed Ricoh photographs in original page order (pages 5–10 omitted), with the transcription directly beneath each one. Select a photograph to open a larger copy. Brackets preserve uncertain readings.
 
-## Deployment
+The public website has no login, database connection, editing interface, or runtime dependency. A separate local server supports corrections. A small local script adds page jumping and an accessible photo viewer with zoom, previous/next pages and arrow-key navigation; the photographs and text remain readable without it. All photographs and text are part of the page's static files. All 79 original full-resolution exports remain untouched.
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for GitHub Pages, Supabase Edge Functions, CI, secrets, and release/rollback instructions. Public source excludes local archive records and photos. Production uses browser bearer sessions; local Node uses HttpOnly cookies.
+## Run locally
 
-## First-time local setup
+Use Node 22.12 or newer. No package installation or environment variables are required.
 
-1. Install and start [Docker Desktop](https://www.docker.com/products/docker-desktop/). The Supabase CLI is installed as a project dev dependency; Docker runs its database, Auth, Storage, Studio, and email inbox.
-2. Run `pnpm install --frozen-lockfile`, then `pnpm supabase:start`. The CLI creates the local stack, applies `supabase/migrations`, and prints connection details. Use `pnpm supabase:status` to see them again. First startup downloads container images.
-3. Copy `.env.example` to `.env` **without overwriting an existing `.env`**. Preserve any existing `OPENAI_API_KEY`. Add `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, and `SUPABASE_SECRET_KEY` from the local stack. The legacy `anon` key can be used as the publishable key and `service_role` as the secret key if those are what your CLI shows. Every key stays on the Node server; never use a `VITE_` prefix or commit `.env`.
-4. Set `APP_ORIGIN=http://127.0.0.1:8000`. Use that exact browser origin. `PORT` defaults to 8000.
-5. With the app stopped, run `pnpm db:migrate` to copy the existing `data/archive.json` and its original/contribution photographs to Supabase. Local originals remain intact. The destination must be empty; the command refuses to overwrite an existing archive. Existing contributions keep their original attribution. Legacy browser sessions and invitation links are not migrated, and names never automatically claim old submissions.
-6. Run `pnpm build` and `pnpm start`, then open <http://127.0.0.1:8000>. Create your own email/password account with **Sign in / Join the crew**. No confirmation email is required.
-7. Run `pnpm archivist -- your-email@example.com`. This server-only bootstrap command promotes that account to archivist. Sign in again and open the workspace. There is no first-signup-wins rule, default password, or role picker in signup.
+```sh
+npm start
+```
 
-Use `pnpm supabase:stop` to stop the local stack. Do not reset the database after importing real data. Keep backups of both the database and Storage objects; a JSON export alone does not contain photographs.
+Open `http://127.0.0.1:8127`. Set `PORT` to use another port.
 
-## Hosted Supabase setup
+```sh
+npm test
+npm run check:secrets
+npm run build
+```
 
-Create a project in the [Supabase dashboard](https://supabase.com/dashboard), link it using `pnpm exec supabase link --project-ref YOUR_PROJECT_REF`, and apply the migration with `pnpm exec supabase db push`. Put its URL, publishable key and server secret key into `.env`. Configure the following in the project dashboard:
+`dist/` is the complete website and works on any static host. Relative asset paths also work at the existing GitHub Pages `/seahawk/` address. The deployment workflow only builds and uploads static files; it no longer deploys a Supabase backend.
 
-- Set Auth Site URL to your exact `APP_ORIGIN`, and allow `APP_ORIGIN/auth/callback` as a redirect URL. Use HTTPS for a hosted app. The server sets Secure cookies when APP_ORIGIN uses HTTPS. Configure your trusted TLS reverse proxy to preserve this public origin; the Node listener remains on loopback.
-- Enable email/password signup and **disable Confirm email**. Disable anonymous sign-ins. Require at least 12-character passwords; enable leaked-password protection where available. Configure Auth rate limits. No SMTP/email service is needed: email addresses are login identifiers, not verified proof of identity. Verify crew members offline before approval.
-- Do not configure email-based recovery or password-change notification emails. The app's Forgot password flow records a private request for the archivist instead of sending mail. Disable any Supabase password-change email notification settings if previously enabled.
-- Keep refresh-token rotation enabled and configure appropriate session timeouts. Supabase handles password hashing and sessions; the archivist handles identity verification and recovery offline.
+## Source photographs and transcriptions
 
-Run the archive migration and archivist bootstrap steps above against the configured project. Project creation and the initial archivist identity require your own account. Never share the server secret key with browser code or users.
+`web/index.html` contains the ordered page text. `web/photos/` contains display-sized JPEG copies at three resolutions. The page reserves image space and loads later photographs lazily, so opening it does not download every full-size photo at once. No third-party fonts, tracking, account services, or runtime weather/chart APIs are loaded. Maps are currently removed; reading the site makes no map requests. On wide screens the photo stays alongside its transcription. A sticky page selector and year navigation preserve the original page numbers, uncertain readings have subtle highlights, and a back-to-top link helps navigate the long page. Space opens/closes the viewer for the page currently in view; zoom is retained while paging through displayed originals. Reading position is saved only in browser local storage and restored on the next visit without a specific page link. Weather uses a compact, expandable summary; full measurements and sources are available inside.
 
-## Permissions and accounts
+To rebuild these files from the private intake, install Pillow for a Python interpreter and run:
 
-| Role | Read public entries and approved contributions | Submit memories, photos, names and clarifications | Review crew requests and contributions | Import, transcribe, edit, map, and share entries |
-| --- | --- | --- | --- | --- |
-| Public visitor | Yes | No | No | No |
-| Pending / declined account | Yes | No | No | No |
-| Approved crew | Yes | Yes | No | No |
-| Archivist | Yes, including private entries | Yes | Yes | Yes |
+```sh
+GALLERY_PYTHON=/path/to/python3 node scripts/export-gallery.js
+```
 
-New accounts start as pending crew, with no contribution access. Archivist approval is required; email ownership is not verified. **Workspace → Crew requests** lists requests with approve/decline controls and lets the archivist revoke approved access. Every decision has a database audit record. Role and approval values come from a server-read profile, never signup metadata. Only the server secret can update them; approval changes apply on the next request.
+Optional positional arguments specify the intake folder and archive snapshot. The exporter verifies all original photo hashes, retains printed text, carries forward confirmed passage corrections, escapes text for HTML, and preserves manifest order. The ordinary build does not require Python, the private intake, or credentials.
 
-Approved crew submit memories (with optional photos), suggested identifications, and clarifications tied to unresolved details. All additions start pending and appear publicly only after archivist review. Private review notes stay out of public and personal APIs. **Your contributions** follows the account across devices and shows only that account’s submissions. Revoked accounts cannot submit or access private submission history/photos. Public reading remains available.
+The previous application and its uncommitted source are preserved under ignored `data/intake/seahawk/previous-app/`, with an additional source archive and patch alongside it. Existing remote Supabase records and accounts have not been deleted.
 
-Signup and sign-in use Supabase Auth without email confirmation. **Forgot password** accepts the account email, returns the same response for existing and unknown accounts, and adds one pending private password-help request for a matching account. Duplicate pending requests are coalesced. It never sends email or changes a password automatically.
+## Publication
 
-The workspace dashboard counts pending account requests. **Workspace → Crew requests → Password-help requests** shows the person's name, login email, and request time. The archivist verifies their identity in person, confirms that verification, enters a replacement password twice, and reenters their own archivist password. The server updates the password through the Supabase Admin API, revokes refresh sessions using an isolated temporary sign-in, and records completion with the reviewing archivist. Passwords are not saved in request/audit rows, logged, or returned in responses. Share the replacement in person and ask the person to change it after signing in. A compromised sole archivist account must be recovered by the project owner through Supabase administration.
+The website has no access control. Publishing `dist/` makes all its photographs and transcriptions accessible, including contact information visible in the originals. Local preparation does not publish anything or change the previous live site.
 
-Ordinary password changes still require the current password. New passwords require 12–128 characters. Successful changes revoke refresh sessions globally; already-issued access tokens can remain usable until their configured expiry. The local Node server uses HttpOnly, SameSite cookies. GitHub Pages uses Supabase SDK browser sessions and bearer tokens; see DEPLOYMENT.md for the production security model. JSON write routes reject cross-origin and cross-site browser requests. Auth actions and manual reset attempts are locally throttled alongside Supabase Auth limits. The password-help migration enables RLS and denies browser roles direct access; only the server can create or review requests.
 
-For a previously configured hosted project, apply the additional migration with `pnpm exec supabase db push`, turn off Auth **Confirm email**, and disable auth email notifications. Existing unconfirmed accounts may need the project owner to confirm them manually in Supabase; new signups will not require mail.
+## Historical weather and weekly music
 
-## Archive and transcription workflows
+Each journal entry is grouped with its own compact weather and weekly music directly beneath that entry’s transcription. Maps are currently removed. Weather always uses Port Aransas, Texas through the July 10–11 entry on page 44, then Kona, Hawaii for every subsequent passage, including the remaining entries on page 44. These home ports were supplied by the owner; place names in the text never choose the weather location.
 
-- Public journal at `/`, stable entries at `/entries/:id`, atlas at `/atlas`. Private entries and their exclusive originals are hidden from public APIs. Sharing an entry shares its complete original page, which may contain several entries.
-- Archivist workspace at `/workspace`, with task queues, an original-page upload dialog, source/transcription editor, contribution review, crew approvals, and private-entry preview.
-- Upload JPEG, PNG or WebP log-page photographs up to 12 MB. Set `OPENAI_API_KEY` for faithful automatic transcription; `OPENAI_MODEL` defaults to `gpt-4.1`. Manual transcription works without a key. Automatic import can split distinct entries and creates private drafts for review. Only an explicit automatic transcription request sends a photo to OpenAI.
-- Keep faithful transcription separate from the generated reading version. Confirmed `as_written` → `corrected` mappings resolve uncertain names and words for generation without rewriting the original. Reading drafts remain labeled AI-generated until reviewed. Generate changes the editor draft; Save persists it and revision history.
-- Entry facts include **What was on the radio at the time**: the Billboard Hot 100 top five for the chart dated at the end of the entry’s week, with song titles, artists, the exact chart date, and source links. Data comes from the public `mhollingshead/billboard-hot-100` archive. Missing dates, dates before the Hot 100 began, and unavailable weeks display an explanation. Chart lookups do not modify archive records. The server shares the chart-date index for 24 hours and retains up to 128 chart lookups in memory per running instance; journal data caching is unchanged.
-- Place editing supports manual latitude/longitude, pasted GPS coordinates, map pins, and explicit precision/source notes. AI-imported coordinates are cleared. City/state lookup is available on demand. OpenStreetMap tiles and Open-Meteo lookup/forecast require network access; historical weather is not inferred.
-- Contribution approval never automatically changes the source text. Approved identifications can be applied as explicit, revisioned entry edits. GPS positions, reading corrections, and metadata use the same saved revision workflow.
-- Export archive JSON and print family drafts from the workspace. Rebuild frontend source after edits.
+Dated entries show daily temperature, rainfall, maximum wind and gusts from Open-Meteo ERA5 reanalysis, a roughly 25 km regional reconstruction rather than an observation aboard the boat. Multi-day entries show each day's weather. The original recorded weather remains in the transcription.
 
-## Storage and security boundary
+Weekly music is the U.S. Billboard Hot 100 top 10 for the chart issue dated within the seven-day week containing the entry, sourced from the public `mhollingshead/billboard-hot-100` archive with links to Billboard. No lyrics or audio are embedded.
 
-Archive records are stored as a versioned JSONB document in Postgres, preserving the existing archive schema and revision history. Each API request owns an isolated snapshot; a transactional compare-and-swap rejects conflicting writes with HTTP 409 instead of losing changes across processes. Reload before retrying a conflicting edit. Profiles and membership-review history have separate tables.
+Dates are resolved across the chronological book, using photograph-reviewed year transitions in `content/chronology.json`. This carries years across page boundaries, corrects misread date headings in context metadata, and handles multi-day entries. Small backward day movements do not invent a new year. The loose retrospective insert on page 77 keeps its explicit April 29, 2000 date. July 2004 has no recorded day, so it gets no invented daily weather or chart. Undated continuations remain undated. The first-pass transcription is preserved separately; interpreted dates are labeled.
 
-Photographs live in the private `archive-photos` Storage bucket. Browser requests go through Node authorization; there are no public bucket URLs. RLS is enabled and browser roles have no direct access to archive/profile/review tables or private objects. Server RPC functions are restricted to `service_role`. The server secret bypasses RLS, so the Node API is the authorization boundary; keep it private. Unreferenced private photos can remain after an ambiguous database/network failure and may need maintenance cleanup. A failed commit never intentionally deletes an object that might already be referenced.
+`content/entry-context.json` contains the prepared weather and charts. `content/entry-layout.json` stores text anchors connecting each entry to the full-page transcription; `node scripts/prepare-entry-layout.js` can regenerate those anchors from the private intake without changing the wording. Normal builds need no network or credentials. To refresh from the private intake snapshot, run `npm run context:refresh` with network access. It sends only the two home-port coordinates and dates to Open-Meteo and dates to the approved public chart archive, never images or full transcriptions. Responses are cached under ignored `data/intake/seahawk/context-cache/`.
 
-The old filesystem adapter, password session module, and legacy invitation helpers remain only to run the existing isolated compatibility tests. `npm start` cannot select those adapters; it requires Supabase credentials. Existing local files are retained as migration sources. The app does not send custom invitation messages or create hosted accounts automatically. GitHub Actions publishes the static frontend and Edge API.
+## Local corrections and the public website
 
-## Development and checks
+`npm start` enables local editing. Select **Edit entry**, correct the transcription or add an optional family clarification, then select **Save correction**. Changes are stored in `content/corrections.json` and survive restarts. Original text and photographs stay untouched. Commit corrections and push to `main` when ready to publish them. Your dad can use this editor on this computer; collaborating across computers currently requires sharing/synchronizing the project through Git, not the public website.
 
-`pnpm dev:server` runs the Node API with file watching. `pnpm dev` runs Vite at <http://127.0.0.1:5173>. For this two-server setup set `APP_ORIGIN=http://127.0.0.1:5173`, update local Supabase Site URL and redirect allowlist to match, and use Vite’s origin throughout the auth flow. Production uses port 8000 by default.
+`npm run preview` serves the same read-only result as GitHub Pages. `npm run build` produces `dist/` with no editing controls or save API. The `local/` editor directory is never copied into that artifact.
 
-`pnpm test` runs TypeScript checks, a production build, and Node tests. Existing archive/transcription tests use temporary filesystem fixtures. Supabase tests exercise authorization, account identity, manual password-help rules, photo handling, and concurrent-commit conflicts with mocked services. They do not validate a live Postgres migration, hosted Auth configuration, or Supabase container health. Test those end to end with the local stack before deployment.
-
-Main files: `server.js`, `lib/supabase-auth.js`, `lib/supabase-store.js`, `supabase/migrations/20261022000000_archive_auth.sql`, `web/src/components/WorkspaceLogin.tsx`, and `web/src/components/CrewRequests.tsx`.
+Display photos are committed under `web/photos/` and served from GitHub Pages; the full-resolution originals and preparation records remain in ignored `data/intake/seahawk/`. See [technical design](docs/technical-design.md).

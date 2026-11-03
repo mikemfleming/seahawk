@@ -10,7 +10,8 @@ dist/
 supabase/.temp/
 supabase/.branches/
 
-# Real archive records and photos belong in private Supabase storage only.
+# Original intake exports, caches and previous-app backups stay local.
+# Public display copies live under web/photos/.
 data/
 .pnpm-store/
 *.log

@@ -1,0 +1,27 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,writeFileSync,readFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {once} from 'node:events';
+import {createApp} from '../server.js';
+test('local corrections persist safely, reject foreign/stale writes, and do not add editing to the public artifact',async t=>{
+ const directory=mkdtempSync(join(tmpdir(),'seahawk-editor-'));t.after(()=>rmSync(directory,{recursive:true,force:true}));
+ const correctionsFile=join(directory,'corrections.json');writeFileSync(correctionsFile,'{}');writeFileSync(join(directory,'index.html'),readFileSync('dist/index.html'));
+ const app=createApp({directory,correctionsFile,editing:true});app.listen(0,'127.0.0.1');await once(app,'listening');t.after(()=>new Promise(done=>app.close(done)));
+ const origin=`http://127.0.0.1:${app.address().port}`;
+ const input={id:'E003',text:'Corrected family name.\n\n<script>unsafe</script>',note:'Dad remembers <this> trip.',revision:null};
+ const save=(data,from=origin)=>fetch(origin+'/__local/entries',{method:'POST',headers:{Origin:from,'Content-Type':'application/json'},body:JSON.stringify(data)});
+ assert.equal((await save(input,'https://example.com')).status,403);
+ assert.equal((await save({...input,id:'unknown'})).status,400);
+ const response=await save(input);assert.equal(response.status,200);const saved=await response.json();assert(saved.updated_at);
+ assert.equal(JSON.parse(readFileSync(correctionsFile)).E003.text,input.text);
+ const rendered=readFileSync(join(directory,'index.html'),'utf8');assert(rendered.includes('&lt;script&gt;unsafe&lt;/script&gt;'));assert(rendered.includes('Dad remembers &lt;this&gt; trip.'));assert(!rendered.includes('<script>unsafe'));
+ assert.equal((await save(input)).status,409);
+ assert.equal((await save({...input,revision:saved.updated_at,note:'Updated note'})).status,200);
+ assert.match(await(await fetch(origin)).text(),/\/__local\/editor.js/);
+ assert.doesNotMatch(readFileSync('dist/index.html','utf8'),/__local|edit-entry|entry-editor/);
+ const publicApp=createApp();publicApp.listen(0,'127.0.0.1');await once(publicApp,'listening');t.after(()=>new Promise(done=>publicApp.close(done)));
+ const publicOrigin=`http://127.0.0.1:${publicApp.address().port}`;
+ assert.equal((await fetch(publicOrigin+'/__local/editor.js')).status,404);assert.equal((await fetch(publicOrigin+'/__local/entries',{method:'POST'})).status,405);
+});
