@@ -60,3 +60,13 @@ Dates are resolved across the chronological book, using photograph-reviewed year
 `npm run preview` serves the same read-only result as GitHub Pages. `npm run build` produces `dist/` with no editing controls or save API. The `local/` editor directory is never copied into that artifact.
 
 Display photos are committed under `web/photos/` and served from GitHub Pages; the full-resolution originals and preparation records remain in ignored `data/intake/seahawk/`. See [technical design](docs/technical-design.md).
+
+## Elsewhere that week and the economy
+
+`content/weekly-context.json` supplies two optional, collapsed sections under dated entries. “Elsewhere that week” uses up to three short event excerpts from Wikipedia's year timelines, credited to Wikipedia contributors under CC BY-SA 4.0. These are retrospective historical events, not contemporary newspaper headlines or a complete news digest. The window is the seven calendar days ending on the entry date; no later events are included.
+
+The economy panel uses public ALFRED CSV downloads without an API key. Each series is downloaded separately and its CSV header must confirm the requested vintage date. Unemployment (UNRATE) and year-over-year CPI inflation (CPIAUCSL, calculated from that same vintage) are monthly indicators available as of the entry date, with their reference months shown. Missing vintage data is left unavailable rather than replaced with today's revised history.
+
+Refresh with `python3 scripts/prepare-weekly-context.py` using a Python environment with `lxml`. Public responses are cached in the ignored intake folder. The build and website require neither Python nor network access. No NYT or FRED API key is used.
+
+The economy panel also shows the S&P 500 price-index close and its change from the preceding calendar week, sourced from Yahoo Finance's public historical chart download without an API key. Both endpoints use the last available trading close on or before the target date; actual dates and the baseline value are displayed. Dividends are excluded. Market history is a separate historical-price dataset, not an ALFRED economic vintage. Invalid or stale data is omitted.

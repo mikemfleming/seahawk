@@ -1,0 +1,10 @@
+{
+  "source": "https://mikemfleming.github.io/seahawk/",
+  "source_sha256": "f6b7e45f53188e784817fc90bd9c17bfd303a1ea623c031bd7deda739baa5c48",
+  "journal_pages": 73,
+  "printed_pages": 38,
+  "text_blocks": 513,
+  "verified_exact_text": true,
+  "yellow_highlights": 60,
+  "pdf": "output/pdf/captains-log-highlighted.pdf"
+}

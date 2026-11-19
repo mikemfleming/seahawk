@@ -1,3 +1,4 @@
+import {weeklyContextHTML} from './render-weekly-context.js';
 import {entryBoundaries,splitTranscription} from './entry-layout.js';
 const escape=value=>String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const day=value=>new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}).format(new Date(value+'T00:00:00Z'));
@@ -21,7 +22,7 @@ function entryHeading(entry){
 }
 function entryContext(entry,data){
  if(!entry.date)return '';
- return `<aside class="entry-context" aria-label="Weather and music for ${day(entry.date)}">${(entry.weather_keys||[entry.weather_key]).map(key=>weatherHTML({...entry,weather_key:key},data)).join('')}${(entry.chart_dates||[entry.chart_date]).map(date=>chartHTML({...entry,chart_date:date},data)).join('')}</aside>`;
+ return `<aside class="entry-context" aria-label="Weather and music for ${day(entry.date)}">${(entry.weather_keys||[entry.weather_key]).map(key=>weatherHTML({...entry,weather_key:key},data)).join('')}${(entry.chart_dates||[entry.chart_date]).map(date=>chartHTML({...entry,chart_date:date},data)).join('')}${weeklyContextHTML(entry,data.weekly)}</aside>`;
 }
 export function renderContextBlock(page,data){
  return page.entries.map(entry=>entryHeading(entry)+entryContext(entry,data)).join('');

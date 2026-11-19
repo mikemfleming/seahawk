@@ -3,3 +3,12 @@
 .entry-editor {width:min(760px,94vw);max-height:90dvh;border:1px solid #bfc5b8;background:#f5f2e9;color:#263c34;padding:24px;border-radius:6px;}
 .entry-editor::backdrop {background:#19251f99;}.entry-editor h2 {font:24px Georgia;margin-bottom:12px;}.entry-editor p,.entry-editor label {font:13px/1.6 system-ui;}.entry-editor label {display:block;margin-block:16px;}
 .entry-editor textarea {display:block;width:100%;padding:12px;margin-top:6px;font:16px/1.7 Georgia;background:#fffdf8;border:1px solid #bfc5b8;box-sizing:border-box;}.entry-editor textarea[name=text] {height:38dvh;}.entry-editor button {min-height:40px;padding:8px 16px;margin-right:10px;}.entry-editor [role=status] {color:#8a3126;}
+
+/* The textarea remains plain text; a synchronized layer paints only backgrounds. */
+.local-editing .uncertain {background:#fff176;}
+.transcription-input {position:relative;margin-top:6px;background:#fffdf8;}
+.entry-editor .transcription-input textarea {position:relative;z-index:1;margin:0;background:transparent;resize:none;color:#263c34;caret-color:#263c34;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;}
+.transcription-highlights {position:absolute;z-index:0;top:1px;left:1px;bottom:1px;padding:12px;overflow:hidden;box-sizing:border-box;pointer-events:none;color:transparent;font:16px/1.7 Georgia;white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;}
+.transcription-highlights>div {white-space:inherit;font:inherit;}
+.transcription-highlights .uncertain {color:transparent;background:#fff176;padding:0;border-radius:0;}
+.entry-editor .highlight-help {font-size:12px;color:#70766a;margin-top:-8px;}

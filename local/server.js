@@ -1,4 +1,4 @@
-import {readFileSync,writeFileSync,renameSync} from 'node:fs';
+import {readFileSync,writeFileSync,renameSync,existsSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {renderEntryContext} from '../scripts/render-context.js';
 export function localEditor({correctionsFile=resolve('content/corrections.json'),directory=resolve('dist')}={}){
@@ -7,7 +7,7 @@ export function localEditor({correctionsFile=resolve('content/corrections.json')
   if(!path.startsWith('/__local/'))return false;
   const reply=(status,body)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(body));};
   if(!/^127\.0\.0\.1:\d+$/.test(req.headers.host||'')){reply(403,{error:'Local access only'});return true;}
-  if(req.method==='GET'&&['/__local/editor.js','/__local/editor.css'].includes(path)){
+  if(req.method==='GET'&&['/__local/editor.js','/__local/editor.css','/__local/uncertainty.js'].includes(path)){
    res.writeHead(200,{'Content-Type':path.endsWith('.js')?'text/javascript':'text/css','Cache-Control':'no-store'});res.end(readFileSync(resolve('local',path.split('/').at(-1))));return true;
   }
   if(path!=='/__local/entries'){reply(404,{error:'Not found'});return true;}
@@ -18,6 +18,7 @@ export function localEditor({correctionsFile=resolve('content/corrections.json')
    let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>100000){reply(413,{error:'Entry too long'});return true;}}
    const input=JSON.parse(body);
    const context=JSON.parse(readFileSync('content/entry-context.json'));
+   if(existsSync('content/weekly-context.json'))context.weekly=JSON.parse(readFileSync('content/weekly-context.json'));
    if(!Object.values(context.pages).some(page=>page.entries.some(entry=>entry.id===input.id))||typeof input.text!=='string'||!input.text.trim()||input.text.length>50000||typeof input.note!=='string'||input.note.length>10000){reply(400,{error:'A known entry and nonempty text are required'});return true;}
    const corrections=read();
    if((corrections[input.id]?.updated_at||null)!==(input.revision||null)){reply(409,{error:'This entry changed in another tab. Reload before editing.'});return true;}
