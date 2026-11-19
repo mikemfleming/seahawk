@@ -1,3 +1,4 @@
+import {formatEntryUpdated} from '../web/entry-updated.js';
 import {weeklyContextHTML} from './render-weekly-context.js';
 import {entryBoundaries,splitTranscription} from './entry-layout.js';
 const escape=value=>String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -39,9 +40,11 @@ export function renderEntryContext(html,data,corrections={}){
     const entry=entries.get(fragment.id);
     const correction=corrections[entry.id];
     const text=correction?correction.text.split(/\n\s*\n/).map(paragraph=>`<p class="passage">${escape(paragraph)}</p>`).join("\n"):fragment.html;
+    const updatedLabel=formatEntryUpdated(correction?.updated_at);
+    const updated=`<p class="entry-updated">${updatedLabel?`Last updated <time datetime="${escape(correction.updated_at)}">${escape(updatedLabel)}</time>`:'Not yet updated'}</p>`;
     const note=correction?.note?.trim()?`<p class="entry-clarification"><strong>Family note:</strong> ${escape(correction.note)}</p>`:"";
     const year=entry.date?.slice(0,4)||entry.period?.[0]||'';
-    return `<article class="log-entry dated-context" data-year="${year}" id="context-${escape(entry.id)}">${entryHeading(entry)}<div class="entry-text">${text}</div>${note}${entryContext(entry,data)}</article>`;
+    return `<article class="log-entry dated-context" data-year="${year}" id="context-${escape(entry.id)}">${entryHeading(entry)}<div class="entry-text">${text}</div>${note}${entryContext(entry,data)}${updated}</article>`;
    }).join('\n');
    return `<div class="transcription"${attrs} id="places-${escape(page.entries[0].id)}">${grouped}</div>`;
   });

@@ -148,3 +148,5 @@ body>header { width:100%; padding:0; margin:0; }
 
 .market-fact {grid-column:1/-1;border-top:1px solid #d7d7ca;padding-top:14px;}
 .market-change {font:500 14px/1.5 system-ui,sans-serif;color:#426258;margin:8px 0 3px;}
+
+.entry-updated {margin:12px 0 0;color:#797e73;font:11px/1.6 system-ui,sans-serif;letter-spacing:0;}

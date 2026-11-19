@@ -1,3 +1,4 @@
+import {formatEntryUpdated} from '/entry-updated.js';
 import {renderUncertainty} from './uncertainty.js';
 document.body.classList.add('local-editing');
 for(const paragraph of document.querySelectorAll('.entry-text .passage'))renderUncertainty(paragraph,paragraph.textContent);
@@ -29,6 +30,10 @@ form.onsubmit=async event=>{
   state[id]=result;active.querySelector('.entry-text').replaceChildren();
   for(const paragraph of result.text.split(/\n\s*\n/)){const p=document.createElement('p');p.className='passage';renderUncertainty(p,paragraph);active.querySelector('.entry-text').append(p);}
   active.querySelector('.entry-clarification')?.remove();if(result.note.trim()){const note=document.createElement('p');note.className='entry-clarification';note.textContent='Family note: '+result.note;active.querySelector('.entry-text').after(note);}
+  let updated=active.querySelector('.entry-updated');
+  if(!updated){updated=document.createElement('p');updated.className='entry-updated';active.insertBefore(updated,active.querySelector('.edit-entry'));}
+  const time=document.createElement('time');time.dateTime=result.updated_at;time.textContent=formatEntryUpdated(result.updated_at);
+  updated.replaceChildren(document.createTextNode('Last updated '),time);
   dialog.close();
  }catch(error){form.querySelector('[role="status"]').textContent=error.message;}finally{submit.disabled=false;}
 };
