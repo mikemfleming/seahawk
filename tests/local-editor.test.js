@@ -21,6 +21,12 @@ test('local corrections persist safely, reject foreign/stale writes, and do not 
  assert.equal((await save({...input,revision:saved.updated_at,note:'Updated note'})).status,200);
  const continuation={id:'P-page-029-prefix',text:'Corrected continuation only.',note:'A separate family clarification.',revision:null};
  assert.equal((await save(continuation)).status,200);
+ // July 25 spans pages 33–34, both of which now also contain artifacts.
+ for(const id of ['E-ed2b609889','E-1bc054bfa7']){
+  const july={id,text:'July 25 correction for '+id,note:'Clarified by Dad.',revision:null};
+  const first=await save(july);assert.equal(first.status,200);const revision=await first.json();
+  assert.equal((await save({...july,text:july.text+' Updated.',revision:revision.updated_at})).status,200);
+ }
  const persisted=JSON.parse(readFileSync(correctionsFile));assert.equal(persisted.E003.text,input.text);assert.equal(persisted['P-page-029-prefix'].text,continuation.text);
  const complete=readFileSync(join(directory,'index.html'),'utf8').match(/<article[^>]*id="context-E-a0b22e406e"[^>]*>[\s\S]*?<\/article>/)[0];assert(complete.includes(continuation.text));assert(complete.includes(continuation.note));
  assert.equal((await save(continuation)).status,409);

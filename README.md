@@ -12,7 +12,7 @@ Use Node 22.12 or newer. No package installation or environment variables are re
 npm start
 ```
 
-Open `http://127.0.0.1:8127`. Set `PORT` to use another port.
+Open `http://127.0.0.1:8127`. Set `PORT` to use another port. The local server restarts automatically when its code changes; refresh the browser to load updated editing controls.
 
 ```sh
 npm test
