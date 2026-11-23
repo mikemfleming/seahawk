@@ -19,7 +19,7 @@
           "source": "prefix"
         }
       ],
-      "evidence": "Undated party paragraph above June 13 continues the June 12 entry on page 28; identified by the owner and checked against pages 28–29."
+      "evidence": "Undated party paragraph above June 13 continues the June 12 entry on page 28; identified by the owner and checked against pages 28\u201329."
     },
     {
       "id": "E-ed2b609889",
@@ -27,7 +27,7 @@
         "E-ed2b609889",
         "E-1bc054bfa7"
       ],
-      "evidence": "The July 25 account continues across the page 33–34 sentence boundary."
+      "evidence": "The July 25 account continues across the page 33\u201334 sentence boundary."
     },
     {
       "id": "E-c550df3542",
@@ -42,7 +42,7 @@
           "before": "July 11th"
         }
       ],
-      "evidence": "July 10 tournament story crosses pages 39–40 and the top of 41, before the July 11 heading."
+      "evidence": "July 10 tournament story crosses pages 39\u201340 and the top of 41, before the July 11 heading."
     },
     {
       "id": "E-8fdb13547b",
@@ -62,7 +62,7 @@
         "E-26ddaedba6",
         "E-476f1f444a"
       ],
-      "evidence": "The hook-in-hand account continues mid-sentence across pages 45–46."
+      "evidence": "The hook-in-hand account continues mid-sentence across pages 45\u201346."
     },
     {
       "id": "E-541740519b",
@@ -87,7 +87,7 @@
           "source": "prefix"
         }
       ],
-      "evidence": "First blue marlin account continues across pages 51–53, before the May 4 heading. Existing date interpretation retained."
+      "evidence": "First blue marlin account continues across pages 51\u201353, before the May 4 heading. Existing date interpretation retained."
     },
     {
       "id": "E-b9ab6b7191",
@@ -107,7 +107,7 @@
         "E-49f0755ca6",
         "E-bb324d94b6"
       ],
-      "evidence": "Last trip of the year continues across pages 71–72."
+      "evidence": "Last trip of the year continues across pages 71\u201372."
     },
     {
       "id": "E-d7072e9cbd",
@@ -126,7 +126,14 @@
     {
       "from": "E-a0b22e406e",
       "to": "P-page-029-prefix",
-      "before": "Well, there’s more to that."
+      "before": "Well, there\u2019s more to that."
+    }
+  ],
+  "absorbed_passages": [
+    {
+      "id": "P-page-041-prefix",
+      "into": "E-a355f8a7f0",
+      "reason": "The owner included the page 41 continuation about the broken T-top brace and Double O tuna party in the corrected page 40 passage."
     }
   ]
 }

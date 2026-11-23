@@ -2,13 +2,36 @@
 const jump = document.getElementById('page-jump');
 const yearJump = document.getElementById('year-jump');
 function syncJump() {
- const target=document.getElementById(location.hash.slice(1));
+ const target=hashTarget();
  const page=target?.closest('.log-page');
  jump.value=page?.id||'';
  if(yearJump)yearJump.value=[...yearJump.options].some(option=>option.value===target?.id)?target.id:'';
 }
+function hashTarget(){
+ try{return document.getElementById(decodeURIComponent(location.hash.slice(1)));}catch{return null;}
+}
+function alignHash(){
+ const target=hashTarget();if(!target)return;
+ target.scrollIntoView({behavior:'instant',block:'start'});syncJump();
+}
 syncJump();
-window.addEventListener('hashchange', syncJump);
+window.addEventListener('hashchange',()=>{alignHash();syncJump();});
+// Local editing adds controls asynchronously. Position explicit links only once
+// the initial layout is ready, rather than leaving the native jump behind.
+let initialLinkPending=Boolean(location.hash);
+let pageLoaded=document.readyState==='complete';
+let editorReady=!document.querySelector('script[src="/__local/editor.js"]')||document.documentElement.dataset.editorReady==='true';
+function settleInitialLink(){
+ if(!initialLinkPending||!pageLoaded||!editorReady)return;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  if(!initialLinkPending)return;
+  alignHash();initialLinkPending=false;
+ }));
+}
+window.addEventListener('load',()=>{pageLoaded=true;settleInitialLink();},{once:true});
+document.addEventListener('journal-editor-ready',()=>{editorReady=true;settleInitialLink();},{once:true});
+for(const event of ['wheel','touchstart','pointerdown','keydown'])window.addEventListener(event,()=>{initialLinkPending=false;},{once:true,passive:true});
+settleInitialLink();
 function navigateTo(id) {
  const target=document.getElementById(id);if(!target)return;
  history.replaceState(null,'',`#${id}`);

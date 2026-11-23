@@ -1,0 +1,25 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,writeFileSync,readFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {once} from 'node:events';
+import {createApp} from '../server.js';
+import {renderEntryContext} from '../scripts/render-context.js';
+test('deleting a passage removes its text and context, retains photos and siblings, and cannot be overwritten by a stale editor',async t=>{
+ const directory=mkdtempSync(join(tmpdir(),'seahawk-delete-'));t.after(()=>rmSync(directory,{recursive:true,force:true}));
+ const correctionsFile=join(directory,'corrections.json');writeFileSync(correctionsFile,JSON.stringify({E003:{text:'Mistaken entry',note:'A family note',updated_at:'2026-11-23T12:00:00Z'}}));writeFileSync(join(directory,'index.html'),readFileSync('dist/index.html'));
+ const app=createApp({directory,correctionsFile,editing:true});app.listen(0,'127.0.0.1');await once(app,'listening');t.after(()=>new Promise(done=>app.close(done)));
+ const origin=`http://127.0.0.1:${app.address().port}`;
+ const post=(data,from=origin)=>fetch(origin+'/__local/entries',{method:'POST',headers:{Origin:from,'Content-Type':'application/json'},body:JSON.stringify(data)});
+ const input={id:'E003',action:'delete',revision:'2026-11-23T12:00:00Z'};
+ assert.equal((await post(input,'https://example.com')).status,403);assert.equal((await post({...input,revision:null})).status,409);
+ assert.equal((await post(input)).status,200);
+ const record=JSON.parse(readFileSync(correctionsFile)).E003;assert.equal(record.deleted,true);assert.equal(record.text,undefined);assert.equal(record.note,undefined);
+ const html=readFileSync(join(directory,'index.html'),'utf8');assert.doesNotMatch(html,/id="context-E003"/);assert.doesNotMatch(html,/Mistaken entry|A family note/);assert.match(html,/id="context-E004"/);assert.match(html,/photos\/011-large.jpg/);assert.match(html,/page-artifact/);
+ assert.equal((await post({id:'E003',text:'Stale text',note:'',revision:record.updated_at})).status,409);
+ const raw=readFileSync('web/index.html','utf8'),data=JSON.parse(readFileSync('content/entry-context.json'));
+ const partial=renderEntryContext(raw,data,{'E-ed2b609889':{deleted:true,updated_at:record.updated_at}});
+ assert.doesNotMatch(partial,/data-passage-id="E-ed2b609889"/);assert.match(partial,/data-passage-id="E-1bc054bfa7"/);assert.match(partial,/id="context-E-ed2b609889"/);
+ const gone=renderEntryContext(raw,data,{'E-ed2b609889':{deleted:true},'E-1bc054bfa7':{deleted:true}});assert.doesNotMatch(gone,/id="context-E-ed2b609889"|data-passage-id="E-1bc054bfa7"/);
+});

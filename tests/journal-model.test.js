@@ -52,3 +52,13 @@ test('an already-corrected continuation can be split without changing any author
  assert.deepEqual(splitContinuationCorrection(split,definition),split);
  assert.throws(()=>splitContinuationCorrection({...original,second:{text:'Existing independent correction'}},definition),/already has/);
 });
+
+test('an absorbed continuation is hidden only when its corrected replacement exists',()=>{
+ const saved=JSON.parse(readFileSync('content/corrections.json'));
+ const html=renderEntryContext(raw,data,saved);
+ assert.doesNotMatch(html,/Really takes a sporting paradox/);
+ assert.match(html,/The boat is really taking a pounding/);
+ assert.match(html,/id="context-P-page-041-prefix" hidden/);
+ assert.doesNotMatch(html,/data-passage-id="P-page-041-prefix"/);
+ assert.match(renderEntryContext(raw,data,{}),/Really takes a sporting paradox/);
+});

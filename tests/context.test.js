@@ -1,3 +1,4 @@
+import {correctedEntryDate} from '../scripts/entry-dates.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -72,6 +73,7 @@ test('every entry retains its source text and has its own attached weather rathe
  const data=JSON.parse(readFileSync('content/entry-context.json'));
  const raw=readFileSync('web/index.html','utf8');const built=readFileSync('dist/index.html','utf8');
  const model=buildJournalModel(raw,data,JSON.parse(readFileSync('content/entry-groups.json')));
+ const corrections=JSON.parse(readFileSync('content/corrections.json'));
  let count=0;
  for(const [order,page]of Object.entries(data.pages)){
   const section=raw.match(new RegExp('<section class="log-page" id="page-'+order.padStart(3,'0')+'"[\\s\\S]*?</section>'))[0];
@@ -84,8 +86,11 @@ test('every entry retains its source text and has its own attached weather rathe
   }
   for(const entry of page.entries){
    const article=built.match(new RegExp('<article class="log-entry dated-context"[^>]*id="context-'+model.membership.get(entry.id)+'"[^>]*>[\\s\\S]*?</article>'))?.[0];
-   assert(article,'Entry wrapper: '+entry.id);assert(built.includes(`data-passage-id="${entry.id}"`));assert(article.includes('class="entry-text"'));
-   if(entry.date){assert(article.indexOf('class="entry-text"')<article.indexOf('class="entry-context"'));assert(article.includes(entry.weather_reference.name));assert(!article.includes('class="entry-home-port"'));assert(!article.includes('class="context-note date-basis"'));assert(article.includes('Weather and music for'));}
+   const group=model.groups.get(model.membership.get(entry.id));
+   if(group.passageIds.every(id=>corrections[id]?.deleted)){assert(!article);count++;continue;}
+   assert(article,'Entry wrapper: '+entry.id);assert.equal(built.includes(`data-passage-id="${entry.id}"`),!corrections[entry.id]?.deleted);assert(article.includes('class="entry-text"'));
+   const resolved=correctedEntryDate(model.groups.get(model.membership.get(entry.id)),corrections,data);
+   if(resolved.date){assert(article.indexOf('class="entry-text"')<article.indexOf('class="entry-context"'));if((resolved.weather_keys||[resolved.weather_key]).some(key=>data.weather[key]))assert(article.includes(resolved.weather_reference.name));else assert(article.includes('Historical weather is unavailable'));assert(!article.includes('class="entry-home-port"'));assert(!article.includes('class="context-note date-basis"'));assert(article.includes('Weather and music for'));}
    count++;
   }
  }

@@ -23,3 +23,7 @@
 .entry-date-fields {display:flex;gap:16px;flex-wrap:wrap;}
 .entry-date-fields label {flex:1;min-width:170px;}
 .entry-date-fields input {display:block;width:100%;box-sizing:border-box;padding:10px;font:16px system-ui;background:#fffdf8;border:1px solid #bfc5b8;color:inherit;}
+.entry-editor .delete-passage {color:#8a3126;margin-block:16px;background:transparent;border:1px solid #bca79b;}
+.delete-confirmation {border-top:1px solid #bca79b;margin-block:16px;padding-top:8px;}
+.delete-confirmation[hidden] {display:none;}
+.entry-editor .confirm-delete {background:#8a3126;color:white;border:1px solid #8a3126;}

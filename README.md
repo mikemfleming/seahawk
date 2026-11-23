@@ -92,3 +92,9 @@ Build and publish normally to include artifacts on the read-only public site. Th
 In the local entry editor, change **Entry date** and optionally **End date**, then save the correction. Leave both blank when the date is unknown. The heading, year navigation and historical-context associations use the saved date; the handwritten transcription remains separately editable. For entries spanning pages, changing the date from either passage updates the whole entry. Date overrides are saved alongside corrections and survive rebuilds.
 
 Only context already prepared for the corrected date is displayed. Missing weather, chart or historical snapshots are marked unavailable; data from the former date is not carried over. Saving a date does not download new historical data.
+
+## Deleting mistaken passages
+
+Open **Edit entry** or **Edit passage**, choose **Delete passage…**, then confirm **Delete passage**. This removes the selected text and its family note. If it was the last passage in an entry, the heading and historical context are also removed. Source photographs, artifacts and other passages stay in place. Publish normally to update the public website.
+
+Deletion replaces the saved correction with a minimal deletion marker so the initial import cannot recreate it on the next build. There is no restore control in the editor; committed history remains available through Git.

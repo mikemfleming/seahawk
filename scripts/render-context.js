@@ -35,16 +35,20 @@ export function renderContextBlock(page,data){
 export function renderEntryContext(html,data,corrections={},grouping=entryGroups,artifacts={items:[]}){
  if(!data)return html;
  const model=buildJournalModel(html,data,grouping);
+ const absorbed=new Set((grouping.absorbed_passages||[]).filter(item=>corrections[item.into]).map(item=>item.id));
  function renderGroup(group){
+  if(group.passageIds.every(id=>corrections[id]?.deleted||absorbed.has(id)))return '';
   const entry=correctedEntryDate(group,corrections,data);
   const title=entry.date?day(entry.date):'Journal note';
   const year=entry.date?.slice(0,4)||entry.period?.[0]||'';
   const parts=group.passageIds.map((id,index)=>{
+   if(corrections[id]?.deleted)return '';
+   if(absorbed.has(id))return `<span id="context-${escape(id)}" hidden></span>`;
    const passage=model.passages.get(id),correction=corrections[id];
    const text=correction?correction.text.split(/\n\s*\n/).map(paragraph=>`<p class="passage">${escape(paragraph)}</p>`).join('\n'):passage.html;
    const note=correction?.note?.trim()?`<p class="entry-clarification"><strong>Family note:</strong> ${escape(correction.note)}</p>`:'';
    return `<div class="entry-passage" data-passage-id="${escape(id)}" data-entry-id="${escape(group.id)}" data-source-page="${passage.page}"${id!==group.id?` id="context-${escape(id)}"`:''}>
-    ${index?`<p class="continuation-divider">Continued on page ${passage.page}</p>`:''}
+    ${group.passageIds.slice(0,index).some(previous=>!corrections[previous]?.deleted&&!absorbed.has(previous))?`<p class="continuation-divider">Continued on page ${passage.page}</p>`:''}
     <div class="passage-source"><span>From page ${passage.page}</span><button type="button" class="source-photo" data-source-page="${passage.page}" aria-label="View original page ${passage.page}">View original ↗</button></div>
     <div class="entry-text">${text}</div>${note}</div>`;
   }).join('\n');
@@ -57,8 +61,10 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
   if(!page.entries.length&&!page.pieces.some(piece=>piece.id))return section;
   const contents=page.pieces.map(piece=>{
    if(!piece.id)return piece.html;
+   if(absorbed.has(piece.id)||corrections[piece.id]?.deleted&&piece.id!==model.membership.get(piece.id))return '';
    const group=model.groups.get(model.membership.get(piece.id));
    if(piece.id===group.id)return renderGroup(group);
+   if(group.passageIds.every(id=>corrections[id]?.deleted||absorbed.has(id)))return '';
    const resolved=correctedEntryDate(group,corrections,data);
    const title=resolved.date?day(resolved.date):'the journal note';
    return `<p class="continuation-reference">This page continues ${escape(title)} from page ${group.pages[0]}. <a href="#context-${escape(piece.id)}">Read this passage in the complete entry ↗</a></p>`;
@@ -70,6 +76,7 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
  // The acquisition account opens the book in December 1994.
  if(data.pages[11])years.set(1994,'page-011');
  for(const group of model.groups.values()){
+  if(group.passageIds.every(id=>corrections[id]?.deleted||absorbed.has(id)))continue;
   const entry=correctedEntryDate(group,corrections,data),order=group.pages[0];
   const year=entry.date?Number(entry.date.slice(0,4)):entry.period?.[0];
   if(year&&!years.has(year))years.set(year,entry.date?'context-'+entry.id:'page-'+String(order).padStart(3,'0'));
