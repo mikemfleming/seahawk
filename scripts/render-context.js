@@ -1,6 +1,8 @@
 import {formatEntryUpdated} from '../web/entry-updated.js';
 import {weeklyContextHTML} from './render-weekly-context.js';
-import {entryBoundaries,splitTranscription} from './entry-layout.js';
+import {buildJournalModel} from './journal-model.js';
+import {readFileSync} from 'node:fs';
+const entryGroups=JSON.parse(readFileSync(new URL('../content/entry-groups.json',import.meta.url)));
 const escape=value=>String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
 const day=value=>new Intl.DateTimeFormat('en-US',{month:'long',day:'numeric',year:'numeric',timeZone:'UTC'}).format(new Date(value+'T00:00:00Z'));
 const number=(value,suffix='',digits=1)=>typeof value==='number'&&Number.isFinite(value)?`${value.toFixed(digits)}${suffix}`:'Not available';
@@ -28,26 +30,38 @@ function entryContext(entry,data){
 export function renderContextBlock(page,data){
  return page.entries.map(entry=>entryHeading(entry)+entryContext(entry,data)).join('');
 }
-export function renderEntryContext(html,data,corrections={}){
+export function renderEntryContext(html,data,corrections={},grouping=entryGroups){
  if(!data)return html;
+ const model=buildJournalModel(html,data,grouping);
+ function renderGroup(group){
+  const entry=group.entry||{id:group.id,date:null};
+  const title=entry.date?day(entry.date):'Journal note';
+  const year=entry.date?.slice(0,4)||entry.period?.[0]||'';
+  const parts=group.passageIds.map((id,index)=>{
+   const passage=model.passages.get(id),correction=corrections[id];
+   const text=correction?correction.text.split(/\n\s*\n/).map(paragraph=>`<p class="passage">${escape(paragraph)}</p>`).join('\n'):passage.html;
+   const note=correction?.note?.trim()?`<p class="entry-clarification"><strong>Family note:</strong> ${escape(correction.note)}</p>`:'';
+   return `<div class="entry-passage" data-passage-id="${escape(id)}" data-entry-id="${escape(group.id)}" data-source-page="${passage.page}"${id!==group.id?` id="context-${escape(id)}"`:''}>
+    ${index?`<p class="continuation-divider">Continued on page ${passage.page}</p>`:''}
+    <div class="passage-source"><span>From page ${passage.page}</span><button type="button" class="source-photo" data-source-page="${passage.page}" aria-label="View original page ${passage.page}">View original ↗</button></div>
+    <div class="entry-text">${text}</div>${note}</div>`;
+  }).join('\n');
+  const latest=group.passageIds.map(id=>corrections[id]?.updated_at).filter(value=>formatEntryUpdated(value)).sort((a,b)=>Date.parse(b)-Date.parse(a))[0];
+  const updated=`<p class="entry-updated">${latest?`Last updated <time datetime="${escape(latest)}">${escape(formatEntryUpdated(latest))}</time>`:'Not yet updated'}</p>`;
+  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-source-pages="${group.pages.join(',')}" id="context-${escape(group.id)}">${entryHeading(entry)}${parts}${entryContext(entry,data)}${updated}</article>`;
+ }
  html=html.replace(/<section class="log-page" id="page-(\d+)"[\s\S]*?<\/section>/g,(section,n)=>{
-  const page=data.pages[Number(n)];if(!page)return section;
-  return section.replace(/<div class="transcription"([^>]*)>([\s\S]*?)<\/div>/,(_,attrs,body)=>{
-   const fragments=splitTranscription(body,entryBoundaries(body,page.entries));
-   const entries=new Map(page.entries.map(entry=>[entry.id,entry]));
-   const grouped=fragments.map(fragment=>{
-    if(!fragment.id)return fragment.html;
-    const entry=entries.get(fragment.id);
-    const correction=corrections[entry.id];
-    const text=correction?correction.text.split(/\n\s*\n/).map(paragraph=>`<p class="passage">${escape(paragraph)}</p>`).join("\n"):fragment.html;
-    const updatedLabel=formatEntryUpdated(correction?.updated_at);
-    const updated=`<p class="entry-updated">${updatedLabel?`Last updated <time datetime="${escape(correction.updated_at)}">${escape(updatedLabel)}</time>`:'Not yet updated'}</p>`;
-    const note=correction?.note?.trim()?`<p class="entry-clarification"><strong>Family note:</strong> ${escape(correction.note)}</p>`:"";
-    const year=entry.date?.slice(0,4)||entry.period?.[0]||'';
-    return `<article class="log-entry dated-context" data-year="${year}" id="context-${escape(entry.id)}">${entryHeading(entry)}<div class="entry-text">${text}</div>${note}${entryContext(entry,data)}${updated}</article>`;
-   }).join('\n');
-   return `<div class="transcription"${attrs} id="places-${escape(page.entries[0].id)}">${grouped}</div>`;
-  });
+  const page=model.pages.get(Number(n));
+  if(!page.entries.length&&!page.pieces.some(piece=>piece.id))return section;
+  const contents=page.pieces.map(piece=>{
+   if(!piece.id)return piece.html;
+   const group=model.groups.get(model.membership.get(piece.id));
+   if(piece.id===group.id)return renderGroup(group);
+   const title=group.entry?.date?day(group.entry.date):'the journal note';
+   return `<p class="continuation-reference">This page continues ${escape(title)} from page ${group.pages[0]}. <a href="#context-${escape(piece.id)}">Read this passage in the complete entry ↗</a></p>`;
+  }).join('\n');
+  const first=page.entries[0]?.id||page.pieces.find(piece=>piece.id)?.id;
+  return section.replace(/<div class="transcription"[^>]*>[\s\S]*?<\/div>/,`<div class="transcription"${page.attrs} id="places-${escape(first)}">${contents}</div>`);
  });
  const years=new Map();
  // The acquisition account opens the book in December 1994.

@@ -199,3 +199,12 @@ let readingTimer;
 window.addEventListener('scroll',()=>{clearTimeout(readingTimer);readingTimer=setTimeout(saveReadingPosition,200);},{passive:true});
 window.addEventListener('pagehide',saveReadingPosition);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveReadingPosition();});
+
+// Passage source buttons open the existing viewer without leaving the complete entry.
+let sourceReturnFocus=null;
+for(const button of document.querySelectorAll('.source-photo'))button.addEventListener('click',()=>{
+ const pageId='page-'+button.dataset.sourcePage.padStart(3,'0');
+ const index=links.findIndex(link=>link.closest('.log-page').id===pageId);
+ if(index>=0){sourceReturnFocus=button;openPhoto(index);}
+});
+dialog.addEventListener('close',()=>{if(sourceReturnFocus){sourceReturnFocus.focus({preventScroll:true});sourceReturnFocus=null;}});

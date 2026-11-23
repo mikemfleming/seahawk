@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "groups": [
+    {
+      "id": "E-d779898898",
+      "passages": [
+        "E-d779898898",
+        "E-be19a07009"
+      ],
+      "evidence": "July 29 narrative continues at the top of page 15 before the August heading."
+    },
+    {
+      "id": "E-a0b22e406e",
+      "passages": [
+        "E-a0b22e406e",
+        {
+          "id": "P-page-029-prefix",
+          "page": 29,
+          "source": "prefix"
+        }
+      ],
+      "evidence": "Undated party paragraph above June 13 continues the June 12 entry on page 28; identified by the owner and checked against pages 28–29."
+    },
+    {
+      "id": "E-ed2b609889",
+      "passages": [
+        "E-ed2b609889",
+        "E-1bc054bfa7"
+      ],
+      "evidence": "The July 25 account continues across the page 33–34 sentence boundary."
+    },
+    {
+      "id": "E-c550df3542",
+      "passages": [
+        "E-c550df3542",
+        "E-a355f8a7f0",
+        {
+          "id": "P-page-041-prefix",
+          "page": 41,
+          "source": "passage-prefix",
+          "passage": "E-67243d16d9",
+          "before": "July 11th"
+        }
+      ],
+      "evidence": "July 10 tournament story crosses pages 39–40 and the top of 41, before the July 11 heading."
+    },
+    {
+      "id": "E-8fdb13547b",
+      "passages": [
+        "E-8fdb13547b",
+        {
+          "id": "P-page-045-prefix",
+          "page": 45,
+          "source": "prefix"
+        }
+      ],
+      "evidence": "November 23 trip continues from leaving the harbor on page 44 to heading south on page 45, before November 27."
+    },
+    {
+      "id": "E-26ddaedba6",
+      "passages": [
+        "E-26ddaedba6",
+        "E-476f1f444a"
+      ],
+      "evidence": "The hook-in-hand account continues mid-sentence across pages 45–46."
+    },
+    {
+      "id": "E-541740519b",
+      "passages": [
+        "E-541740519b",
+        {
+          "id": "P-page-050-prefix",
+          "page": 50,
+          "source": "prefix"
+        }
+      ],
+      "evidence": "April 9 trolling account continues at Kealakekua on page 50, before April 13."
+    },
+    {
+      "id": "E-a73bd50f4b",
+      "passages": [
+        "E-a73bd50f4b",
+        "E-428706f871",
+        {
+          "id": "P-page-053-prefix",
+          "page": 53,
+          "source": "prefix"
+        }
+      ],
+      "evidence": "First blue marlin account continues across pages 51–53, before the May 4 heading. Existing date interpretation retained."
+    },
+    {
+      "id": "E-b9ab6b7191",
+      "passages": [
+        "E-b9ab6b7191",
+        {
+          "id": "P-page-060-prefix",
+          "page": 60,
+          "source": "prefix"
+        }
+      ],
+      "evidence": "February trip and whale account continues at the top of page 60, before February 21."
+    },
+    {
+      "id": "E-49f0755ca6",
+      "passages": [
+        "E-49f0755ca6",
+        "E-bb324d94b6"
+      ],
+      "evidence": "Last trip of the year continues across pages 71–72."
+    },
+    {
+      "id": "E-d7072e9cbd",
+      "passages": [
+        "E-d7072e9cbd",
+        {
+          "id": "P-page-079-body",
+          "page": 79,
+          "source": "body"
+        }
+      ],
+      "evidence": "Retrospective typed insert on page 77 ends with birds accompanied by; page 79 continues with frigate birds. Page 78 is an intervening clipping."
+    }
+  ],
+  "correction_splits": [
+    {
+      "from": "E-a0b22e406e",
+      "to": "P-page-029-prefix",
+      "before": "Well, there’s more to that."
+    }
+  ]
+}

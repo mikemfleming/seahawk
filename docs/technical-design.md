@@ -19,3 +19,7 @@
 **Publication:** Pushes to `main` trigger GitHub Actions checks, build and Pages deployment. Only `dist/` is uploaded as the website. Repository source and committed display photos are public; rendered corrections and family notes become public at deployment.
 
 **Validation:** Checks cover photo order, transcription preservation, entry/date/weather/chart associations, escaped corrections, local saves, stale-write rejection and absence of editing functionality from the public build. Browser review verifies visual changes.
+
+## Entries and passages
+
+Logical entries are composed of ordered, independently editable passages. `scripts/journal-model.js` derives this model from existing source transcriptions plus the explicit reviewed relationships in `content/entry-groups.json`. Original passage IDs and correction records stay intact. Previously unaddressable continuation fragments receive stable IDs. Date and historical context belong to the logical entry; text, family notes and source-photo references belong to each passage. Photo-page links and historical passage anchors are retained.

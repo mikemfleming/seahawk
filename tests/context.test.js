@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {validDate,headingParts,resolveEntryDates,resolveBookDates,chartWeek,topTen,explicitCoordinates,weatherRecord} from '../scripts/context-data.js';
+import {buildJournalModel} from '../scripts/journal-model.js';
 import {searchableHTML,entryBoundaries,splitTranscription} from '../scripts/entry-layout.js';
 import {renderContextBlock,renderEntryContext} from '../scripts/render-context.js';
 
@@ -70,6 +71,7 @@ test('reading aids keep detailed weather collapsed and year navigation points to
 test('every entry retains its source text and has its own attached weather rather than a page-end panel',()=>{
  const data=JSON.parse(readFileSync('content/entry-context.json'));
  const raw=readFileSync('web/index.html','utf8');const built=readFileSync('dist/index.html','utf8');
+ const model=buildJournalModel(raw,data,JSON.parse(readFileSync('content/entry-groups.json')));
  let count=0;
  for(const [order,page]of Object.entries(data.pages)){
   const section=raw.match(new RegExp('<section class="log-page" id="page-'+order.padStart(3,'0')+'"[\\s\\S]*?</section>'))[0];
@@ -81,8 +83,8 @@ test('every entry retains its source text and has its own attached weather rathe
    assert.equal((fragment.html.match(/<mark\b/g)||[]).length,(fragment.html.match(/<\/mark>/g)||[]).length,'Balanced uncertainty marks on page '+order);
   }
   for(const entry of page.entries){
-   const article=built.match(new RegExp('<article class="log-entry dated-context"[^>]*id="context-'+entry.id+'"[^>]*>[\\s\\S]*?</article>'))?.[0];
-   assert(article,'Entry wrapper: '+entry.id);assert(article.includes('class="entry-text"'));
+   const article=built.match(new RegExp('<article class="log-entry dated-context"[^>]*id="context-'+model.membership.get(entry.id)+'"[^>]*>[\\s\\S]*?</article>'))?.[0];
+   assert(article,'Entry wrapper: '+entry.id);assert(built.includes(`data-passage-id="${entry.id}"`));assert(article.includes('class="entry-text"'));
    if(entry.date){assert(article.indexOf('class="entry-text"')<article.indexOf('class="entry-context"'));assert(article.includes(entry.weather_reference.name));assert(!article.includes('class="entry-home-port"'));assert(!article.includes('class="context-note date-basis"'));assert(article.includes('Weather and music for'));}
    count++;
   }

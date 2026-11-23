@@ -70,3 +70,11 @@ The economy panel uses public ALFRED CSV downloads without an API key. Each seri
 Refresh with `python3 scripts/prepare-weekly-context.py` using a Python environment with `lxml`. Public responses are cached in the ignored intake folder. The build and website require neither Python nor network access. No NYT or FRED API key is used.
 
 The economy panel also shows the S&P 500 price-index close and its change from the preceding calendar week, sourced from Yahoo Finance's public historical chart download without an API key. Both endpoints use the last available trading close on or before the target date; actual dates and the baseline value are displayed. Dividends are excluded. Market history is a separate historical-price dataset, not an ALFRED economic vintage. Invalid or stale data is omitted.
+
+## Entries that span pages
+
+`content/entry-groups.json` records reviewed continuation relationships. The build extracts stable passages from the source photographs, then renders each logical entry once with an ordered list of passages. The 185 original passage IDs remain correction keys. Seven formerly unaddressable fragments have additional stable IDs; the July 10/11 boundary on page 41 is split without changing source wording. Undated passages are not joined automatically.
+
+Each passage keeps its source page, correction and family note. A “View original” button opens the corresponding photo. Photographs and original page anchors stay in page order; continuation pages link back to the complete entry. Weather, music, historical events and the economy appear once after the final passage. The entry's last-updated label uses its most recently saved passage.
+
+The local editor edits a single passage at a time and names the complete entry and source pages in the dialog. Existing correction keys and notes remain independent. One correction already contained the page 29 continuation; `scripts/migrate-continuation-corrections.js --write` split that saved text at its reviewed paragraph boundary, preserving the exact combined wording and original timestamp. The original correction file is backed up under ignored `data/intake/seahawk/refactor-backups/`. The migration is idempotent and refuses to overwrite an existing destination correction. To correct a grouping later, change only the reviewed relationship in `content/entry-groups.json`.

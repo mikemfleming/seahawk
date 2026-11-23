@@ -63,7 +63,7 @@ for section in pages:
  content=transcript.xpath('.//p[not(ancestor::aside)] | .//h3[not(ancestor::aside)]')
  for node in content:
   text=clean(node.text_content())
-  if text:blocks.append(('date' if node.tag=='h3' else 'body',text))
+  if text and (node.tag=='h3' or 'passage' in (node.get('class') or '').split() or 'entry-clarification' in (node.get('class') or '').split()):blocks.append(('date' if node.tag=='h3' else 'body',text))
 args.output.parent.mkdir(parents=True,exist_ok=True)
 doc=SimpleDocTemplate(str(args.output),pagesize=letter,rightMargin=58,leftMargin=58,topMargin=52,bottomMargin=49,title='Captain’s Log',author='',pageCompression=1)
 flow=[Paragraph(markup(text),styles[kind]) for kind,text in blocks]

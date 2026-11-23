@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {buildJournalModel} from '../scripts/journal-model.js';
 import {formatEntryUpdated} from '../web/entry-updated.js';
 import {renderEntryContext} from '../scripts/render-context.js';
 test('update timestamps show a real saved instant in a labeled timezone without inventing dates',()=>{
@@ -11,5 +12,5 @@ test('update timestamps show a real saved instant in a labeled timezone without 
  const article=html.match(/<article[^>]*id="context-E003"[^>]*>[\s\S]*?<\/article>/)[0];
  assert.match(article,/Last updated <time datetime="2026-11-19T19:28:26.963Z">/);assert.match(article,/1:28 PM CST/);
  const untouched=html.match(/<article[^>]*id="context-E002"[^>]*>[\s\S]*?<\/article>/)[0];assert.match(untouched,/Not yet updated/);
- assert.equal((html.match(/class="entry-updated"/g)||[]).length,185);
+ assert.equal((html.match(/class="entry-updated"/g)||[]).length,buildJournalModel(raw,data,JSON.parse(readFileSync('content/entry-groups.json'))).groups.size);
 });

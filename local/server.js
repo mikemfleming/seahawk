@@ -1,3 +1,4 @@
+import {buildJournalModel} from '../scripts/journal-model.js';
 import {readFileSync,writeFileSync,renameSync,existsSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {renderEntryContext} from '../scripts/render-context.js';
@@ -19,11 +20,14 @@ export function localEditor({correctionsFile=resolve('content/corrections.json')
    const input=JSON.parse(body);
    const context=JSON.parse(readFileSync('content/entry-context.json'));
    if(existsSync('content/weekly-context.json'))context.weekly=JSON.parse(readFileSync('content/weekly-context.json'));
-   if(!Object.values(context.pages).some(page=>page.entries.some(entry=>entry.id===input.id))||typeof input.text!=='string'||!input.text.trim()||input.text.length>50000||typeof input.note!=='string'||input.note.length>10000){reply(400,{error:'A known entry and nonempty text are required'});return true;}
+   const source=readFileSync('web/index.html','utf8');
+   const grouping=JSON.parse(readFileSync('content/entry-groups.json'));
+   const model=buildJournalModel(source,context,grouping);
+   if(!model.passages.has(input.id)||typeof input.text!=='string'||!input.text.trim()||input.text.length>50000||typeof input.note!=='string'||input.note.length>10000){reply(400,{error:'A known entry and nonempty text are required'});return true;}
    const corrections=read();
    if((corrections[input.id]?.updated_at||null)!==(input.revision||null)){reply(409,{error:'This entry changed in another tab. Reload before editing.'});return true;}
    corrections[input.id]={text:input.text,note:input.note,updated_at:new Date().toISOString()};
-   const html=renderEntryContext(readFileSync('web/index.html','utf8'),context,corrections);
+   const html=renderEntryContext(source,context,corrections,grouping);
    writeFileSync(correctionsFile+'.tmp',JSON.stringify(corrections,null,2)+'\n');renameSync(correctionsFile+'.tmp',correctionsFile);
    writeFileSync(resolve(directory,'index.html'),html);
    reply(200,corrections[input.id]);

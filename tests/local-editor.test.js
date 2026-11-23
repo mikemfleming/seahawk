@@ -19,6 +19,11 @@ test('local corrections persist safely, reject foreign/stale writes, and do not 
  const rendered=readFileSync(join(directory,'index.html'),'utf8');assert(rendered.includes('&lt;script&gt;unsafe&lt;/script&gt;'));assert(rendered.includes('Dad remembers &lt;this&gt; trip.'));assert(!rendered.includes('<script>unsafe'));
  assert.equal((await save(input)).status,409);
  assert.equal((await save({...input,revision:saved.updated_at,note:'Updated note'})).status,200);
+ const continuation={id:'P-page-029-prefix',text:'Corrected continuation only.',note:'A separate family clarification.',revision:null};
+ assert.equal((await save(continuation)).status,200);
+ const persisted=JSON.parse(readFileSync(correctionsFile));assert.equal(persisted.E003.text,input.text);assert.equal(persisted['P-page-029-prefix'].text,continuation.text);
+ const complete=readFileSync(join(directory,'index.html'),'utf8').match(/<article[^>]*id="context-E-a0b22e406e"[^>]*>[\s\S]*?<\/article>/)[0];assert(complete.includes(continuation.text));assert(complete.includes(continuation.note));
+ assert.equal((await save(continuation)).status,409);
  assert.match(await(await fetch(origin)).text(),/\/__local\/editor.js/);
  assert.doesNotMatch(readFileSync('dist/index.html','utf8'),/__local|edit-entry|entry-editor/);
  const publicApp=createApp();publicApp.listen(0,'127.0.0.1');await once(publicApp,'listening');t.after(()=>new Promise(done=>publicApp.close(done)));

@@ -150,3 +150,11 @@ body>header { width:100%; padding:0; margin:0; }
 .market-change {font:500 14px/1.5 system-ui,sans-serif;color:#426258;margin:8px 0 3px;}
 
 .entry-updated {margin:12px 0 0;color:#797e73;font:11px/1.6 system-ui,sans-serif;letter-spacing:0;}
+
+.entry-passage {scroll-margin-top:95px;}
+.passage-source {display:flex;gap:12px;align-items:baseline;margin:0 0 12px;color:#797e73;font:11px/1.6 system-ui,sans-serif;}
+.source-photo {border:0;padding:0;background:transparent;color:#426258;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer;}
+.continuation-divider {border-top:1px dashed #c4ccb9;padding-top:18px;margin:26px 0 10px;font:italic 14px/1.6 Georgia,serif;color:#70766a;}
+.continuation-reference {margin:0 0 22px;font:13px/1.7 system-ui,sans-serif;color:#70766a;}
+.continuation-reference a {color:#426258;text-underline-offset:3px;}
+@media print{.source-photo {display:none;}}
