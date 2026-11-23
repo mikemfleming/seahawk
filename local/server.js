@@ -1,3 +1,4 @@
+import {dateOverrideError,latestDateCorrection} from '../scripts/entry-dates.js';
 import {buildJournalModel} from '../scripts/journal-model.js';
 import {validateArtifact,renderArtifact} from '../scripts/artifacts.js';
 import {readFileSync,writeFileSync,renameSync,existsSync} from 'node:fs';
@@ -39,7 +40,13 @@ export function localEditor({correctionsFile=resolve('content/corrections.json')
    }else{
     if(!model.passages.has(input.id)||typeof input.text!=='string'||!input.text.trim()||input.text.length>50000||typeof input.note!=='string'||input.note.length>10000){reply(400,{error:'A known entry and nonempty text are required'});return true;}
     if((corrections[input.id]?.updated_at||null)!==(input.revision||null)){reply(409,{error:'This entry changed in another tab. Reload before editing.'});return true;}
-    record={text:input.text,note:input.note,updated_at:new Date().toISOString()};corrections[input.id]=record;file=correctionsFile;saved=corrections;response=record;
+    const group=model.groups.get(model.membership.get(input.id));
+    if(Object.hasOwn(input,'date_override')){
+     const error=dateOverrideError(input.date_override);if(error){reply(400,{error});return true;}
+     if((latestDateCorrection(group,corrections)?.date_updated_at||null)!==(input.date_revision||null)){reply(409,{error:'This entry’s date changed in another tab. Copy your text before reloading.'});return true;}
+    }
+    const now=new Date(Math.max(Date.now(),Date.parse(latestDateCorrection(group,corrections)?.date_updated_at||'1970-01-01')+1)).toISOString();
+    record={...corrections[input.id],text:input.text,note:input.note,updated_at:now,...(Object.hasOwn(input,'date_override')?{date_override:{date:input.date_override.date,end_date:input.date_override.end_date},date_updated_at:now}:{})};corrections[input.id]=record;file=correctionsFile;saved=corrections;response=record;
    }
    const html=renderEntryContext(source,context,corrections,grouping,artifacts);
    writeFileSync(file+'.tmp',JSON.stringify(saved,null,2)+'\n');renameSync(file+'.tmp',file);

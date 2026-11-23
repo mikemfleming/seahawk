@@ -1,3 +1,4 @@
+import {correctedEntryDate,latestDateCorrection} from './entry-dates.js';
 import {renderPageArtifacts} from './artifacts.js';
 import {formatEntryUpdated} from '../web/entry-updated.js';
 import {weeklyContextHTML} from './render-weekly-context.js';
@@ -26,7 +27,7 @@ function entryHeading(entry){
 }
 function entryContext(entry,data){
  if(!entry.date)return '';
- return `<aside class="entry-context" aria-label="Weather and music for ${day(entry.date)}">${(entry.weather_keys||[entry.weather_key]).map(key=>weatherHTML({...entry,weather_key:key},data)).join('')}${(entry.chart_dates||[entry.chart_date]).map(date=>chartHTML({...entry,chart_date:date},data)).join('')}${weeklyContextHTML(entry,data.weekly)}</aside>`;
+ return `<aside class="entry-context" aria-label="Weather and music for ${day(entry.date)}">${(entry.weather_keys||[entry.weather_key]).map(key=>weatherHTML({...entry,weather_key:key},data)).join('')}${(entry.chart_dates?.length?entry.chart_dates:[entry.chart_date]).map(date=>chartHTML({...entry,chart_date:date},data)).join('')}${weeklyContextHTML(entry,data.weekly)}${entry.basis==='Date corrected by the family'&&!data.weekly?.snapshots?.[entry.date]?'<p class="context-note">Historical events and economy data have not been prepared for this corrected date.</p>':''}</aside>`;
 }
 export function renderContextBlock(page,data){
  return page.entries.map(entry=>entryHeading(entry)+entryContext(entry,data)).join('');
@@ -35,7 +36,7 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
  if(!data)return html;
  const model=buildJournalModel(html,data,grouping);
  function renderGroup(group){
-  const entry=group.entry||{id:group.id,date:null};
+  const entry=correctedEntryDate(group,corrections,data);
   const title=entry.date?day(entry.date):'Journal note';
   const year=entry.date?.slice(0,4)||entry.period?.[0]||'';
   const parts=group.passageIds.map((id,index)=>{
@@ -49,7 +50,7 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
   }).join('\n');
   const latest=group.passageIds.map(id=>corrections[id]?.updated_at).filter(value=>formatEntryUpdated(value)).sort((a,b)=>Date.parse(b)-Date.parse(a))[0];
   const updated=`<p class="entry-updated">${latest?`Last updated <time datetime="${escape(latest)}">${escape(formatEntryUpdated(latest))}</time>`:'Not yet updated'}</p>`;
-  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-source-pages="${group.pages.join(',')}" id="context-${escape(group.id)}">${entryHeading(entry)}${parts}${entryContext(entry,data)}${updated}</article>`;
+  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-entry-date="${escape(entry.date||'')}" data-entry-end-date="${escape(entry.end_date||'')}" data-date-revision="${escape(latestDateCorrection(group,corrections)?.date_updated_at||'')}" data-source-pages="${group.pages.join(',')}" id="context-${escape(group.id)}">${entryHeading(entry)}${parts}${entryContext(entry,data)}${updated}</article>`;
  }
  html=html.replace(/<section class="log-page" id="page-(\d+)"[\s\S]*?<\/section>/g,(section,n)=>{
   const page=model.pages.get(Number(n));
@@ -58,7 +59,8 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
    if(!piece.id)return piece.html;
    const group=model.groups.get(model.membership.get(piece.id));
    if(piece.id===group.id)return renderGroup(group);
-   const title=group.entry?.date?day(group.entry.date):'the journal note';
+   const resolved=correctedEntryDate(group,corrections,data);
+   const title=resolved.date?day(resolved.date):'the journal note';
    return `<p class="continuation-reference">This page continues ${escape(title)} from page ${group.pages[0]}. <a href="#context-${escape(piece.id)}">Read this passage in the complete entry ↗</a></p>`;
   }).join('\n');
   const first=page.entries[0]?.id||page.pieces.find(piece=>piece.id)?.id;
@@ -67,7 +69,8 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
  const years=new Map();
  // The acquisition account opens the book in December 1994.
  if(data.pages[11])years.set(1994,'page-011');
- for(const [order,page]of Object.entries(data.pages))for(const entry of page.entries){
+ for(const group of model.groups.values()){
+  const entry=correctedEntryDate(group,corrections,data),order=group.pages[0];
   const year=entry.date?Number(entry.date.slice(0,4)):entry.period?.[0];
   if(year&&!years.has(year))years.set(year,entry.date?'context-'+entry.id:'page-'+String(order).padStart(3,'0'));
  }

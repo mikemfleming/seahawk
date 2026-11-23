@@ -20,3 +20,6 @@
 .crop-selection { position: absolute; box-sizing: border-box; border: 2px solid #fff; outline: 2px solid #32694e; box-shadow: 0 0 0 1000px #0007; pointer-events: none; }
 .add-artifact { justify-self: start; }
 .edit-artifact { margin: .8rem 0 0 1rem; }
+.entry-date-fields {display:flex;gap:16px;flex-wrap:wrap;}
+.entry-date-fields label {flex:1;min-width:170px;}
+.entry-date-fields input {display:block;width:100%;box-sizing:border-box;padding:10px;font:16px system-ui;background:#fffdf8;border:1px solid #bfc5b8;color:inherit;}

@@ -86,3 +86,9 @@ In the local editor, choose **Add artifact to page …** below a page’s transc
 Artifacts are independent page content stored in `content/artifacts.json`, with stable IDs, source page, type, title, caption, normalized crop and creation/update times. Crops display the existing source photograph without altering it or creating another image copy. Transcription corrections and family notes stay in `content/corrections.json`. Adding an artifact does not remove an existing illustration placeholder from the transcription.
 
 Build and publish normally to include artifacts on the read-only public site. The public build includes the rendered cards and source-photo links, never editing controls or save endpoints.
+
+## Correcting entry dates
+
+In the local entry editor, change **Entry date** and optionally **End date**, then save the correction. Leave both blank when the date is unknown. The heading, year navigation and historical-context associations use the saved date; the handwritten transcription remains separately editable. For entries spanning pages, changing the date from either passage updates the whole entry. Date overrides are saved alongside corrections and survive rebuilds.
+
+Only context already prepared for the corrected date is displayed. Missing weather, chart or historical snapshots are marked unavailable; data from the former date is not carried over. Saving a date does not download new historical data.

@@ -27,6 +27,15 @@ test('local corrections persist safely, reject foreign/stale writes, and do not 
   const first=await save(july);assert.equal(first.status,200);const revision=await first.json();
   assert.equal((await save({...july,text:july.text+' Updated.',revision:revision.updated_at})).status,200);
  }
+ const before=JSON.parse(readFileSync(correctionsFile));
+ const dateInput={id:'E-1bc054bfa7',text:before['E-1bc054bfa7'].text,note:'Continuation note',revision:before['E-1bc054bfa7'].updated_at,date_override:{date:'1997-07-26',end_date:null},date_revision:null};
+ const dateResponse=await save(dateInput);assert.equal(dateResponse.status,200);const dated=await dateResponse.json();
+ assert.match(readFileSync(join(directory,'index.html'),'utf8'),/data-entry-title="July 26, 1997"/);
+ const parent=before['E-ed2b609889'];
+ assert.equal((await save({id:'E-ed2b609889',text:parent.text,note:parent.note,revision:parent.updated_at,date_override:{date:'1997-07-27',end_date:null},date_revision:null})).status,409);
+ assert.equal((await save({...dateInput,revision:dated.updated_at,date_revision:dated.date_updated_at,date_override:{date:'1997-02-30',end_date:null}})).status,400);
+ assert.equal((await save({id:dateInput.id,text:dated.text,note:'Note-only update',revision:dated.updated_at})).status,200);
+ assert.deepEqual(JSON.parse(readFileSync(correctionsFile))[dateInput.id].date_override,dateInput.date_override);
  const persisted=JSON.parse(readFileSync(correctionsFile));assert.equal(persisted.E003.text,input.text);assert.equal(persisted['P-page-029-prefix'].text,continuation.text);
  const complete=readFileSync(join(directory,'index.html'),'utf8').match(/<article[^>]*id="context-E-a0b22e406e"[^>]*>[\s\S]*?<\/article>/)[0];assert(complete.includes(continuation.text));assert(complete.includes(continuation.note));
  assert.equal((await save(continuation)).status,409);
