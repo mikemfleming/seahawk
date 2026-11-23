@@ -78,3 +78,11 @@ The economy panel also shows the S&P 500 price-index close and its change from t
 Each passage keeps its source page, correction and family note. A “View original” button opens the corresponding photo. Photographs and original page anchors stay in page order; continuation pages link back to the complete entry. Weather, music, historical events and the economy appear once after the final passage. The entry's last-updated label uses its most recently saved passage.
 
 The local editor edits a single passage at a time and names the complete entry and source pages in the dialog. Existing correction keys and notes remain independent. One correction already contained the page 29 continuation; `scripts/migrate-continuation-corrections.js --write` split that saved text at its reviewed paragraph boundary, preserving the exact combined wording and original timestamp. The original correction file is backed up under ignored `data/intake/seahawk/refactor-backups/`. The migration is idempotent and refuses to overwrite an existing destination correction. To correct a grouping later, change only the reviewed relationship in `content/entry-groups.json`.
+
+## Page artifacts
+
+In the local editor, choose **Add artifact to page …** below a page’s transcription. Drag a rectangle over the photograph to select a drawing or detail, choose a type, add a title and optional caption, then **Save artifact**. **Use whole page** clears the crop. Saved cards have an **Edit artifact** button for later changes.
+
+Artifacts are independent page content stored in `content/artifacts.json`, with stable IDs, source page, type, title, caption, normalized crop and creation/update times. Crops display the existing source photograph without altering it or creating another image copy. Transcription corrections and family notes stay in `content/corrections.json`. Adding an artifact does not remove an existing illustration placeholder from the transcription.
+
+Build and publish normally to include artifacts on the read-only public site. The public build includes the rendered cards and source-photo links, never editing controls or save endpoints.

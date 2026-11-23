@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtempSync,writeFileSync,readFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {once} from 'node:events';
+import {createApp} from '../server.js';
+import {validateArtifact} from '../scripts/artifacts.js';
+test('artifact crops stay within known photographed pages',()=>{
+ const pages=new Map([[33,{}]]),item={page:33,type:'illustration',title:'Bowrail',caption:'',crop:null};
+ assert.equal(validateArtifact(item,pages),null);
+ for(const bad of [null,{...item,page:5},{...item,title:''},{...item,type:'script'},{...item,crop:{x:.9,y:0,width:.5,height:1}}])assert.ok(validateArtifact(bad,pages));
+});
+test('artifacts persist independently, escape captions, and reject stale updates',async t=>{
+ const directory=mkdtempSync(join(tmpdir(),'seahawk-artifacts-'));t.after(()=>rmSync(directory,{recursive:true,force:true}));
+ const correctionsFile=join(directory,'corrections.json'),artifactsFile=join(directory,'artifacts.json');writeFileSync(correctionsFile,'{}');writeFileSync(join(directory,'index.html'),readFileSync('dist/index.html'));
+ const app=createApp({directory,correctionsFile,artifactsFile,editing:true});app.listen(0,'127.0.0.1');await once(app,'listening');t.after(()=>new Promise(done=>app.close(done)));
+ const origin=`http://127.0.0.1:${app.address().port}`;
+ const save=(path,data,from=origin)=>fetch(origin+'/__local/'+path,{method:'POST',headers:{Origin:from,'Content-Type':'application/json'},body:JSON.stringify(data)});
+ const input={page:33,type:'illustration',title:'Bowrail <detail>',caption:'Dad’s <script>caption</script>',crop:{x:.1,y:.2,width:.4,height:.3},revision:null};
+ assert.equal((await save('artifacts',input,'https://example.com')).status,403);
+ const response=await save('artifacts',input);assert.equal(response.status,200);const {artifact,html}=await response.json();
+ assert.match(artifact.id,/^A-/);assert.match(html,/viewBox=/);assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);
+ assert.equal(readFileSync(correctionsFile,'utf8'),'{}');
+ assert.equal((await save('artifacts',{...input,id:artifact.id})).status,409);
+ assert.equal((await save('artifacts',{...input,id:artifact.id,revision:artifact.updated_at,title:'Corrected title'})).status,200);
+ assert.equal((await save('entries',{id:'E003',text:'Corrected transcription.',note:'Family memory',revision:null})).status,200);
+ const output=readFileSync(join(directory,'index.html'),'utf8');assert.match(output,/Corrected title/);assert.match(output,/Corrected transcription/);assert.match(output,/Family memory/);
+ const items=await(await fetch(origin+'/__local/artifacts')).json();assert.equal(items.items.length,1);assert.equal(items.items[0].title,'Corrected title');
+ const publicApp=createApp({directory});publicApp.listen(0,'127.0.0.1');await once(publicApp,'listening');t.after(()=>new Promise(done=>publicApp.close(done)));
+ const publicOrigin=`http://127.0.0.1:${publicApp.address().port}`;assert.equal((await fetch(publicOrigin+'/__local/artifacts')).status,404);assert.equal((await fetch(publicOrigin+'/__local/artifacts',{method:'POST'})).status,405);
+});

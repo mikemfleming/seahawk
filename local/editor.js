@@ -1,3 +1,4 @@
+import './artifacts.js';
 import {formatEntryUpdated} from '/entry-updated.js';
 import {renderUncertainty} from './uncertainty.js';
 document.body.classList.add('local-editing');

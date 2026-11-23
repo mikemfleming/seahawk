@@ -158,3 +158,12 @@ body>header { width:100%; padding:0; margin:0; }
 .continuation-reference {margin:0 0 22px;font:13px/1.7 system-ui,sans-serif;color:#70766a;}
 .continuation-reference a {color:#426258;text-underline-offset:3px;}
 @media print{.source-photo {display:none;}}
+
+.page-artifacts { grid-column: 2; min-width: 0; display: grid; gap: 1.8rem; margin-top: 1.5rem; }
+.page-artifact { margin: 0; border-top: 1px solid var(--line, #d6d1c4); padding-top: 1.5rem; }
+.artifact-image { overflow: hidden; background: #eee8da; }
+.artifact-image svg { display: block; width: 100%; height: auto; overflow: hidden; }
+.artifact-type { display: block; margin-top: 1rem; font: .75rem/1.5 system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #746b59; }
+.page-artifact h3 { margin: .3rem 0 .6rem; }
+.artifact-caption { white-space: pre-wrap; }
+@media (max-width: 800px) { .page-artifacts { grid-column: 1 / -1; } }

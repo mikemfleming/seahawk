@@ -202,7 +202,8 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 
 // Passage source buttons open the existing viewer without leaving the complete entry.
 let sourceReturnFocus=null;
-for(const button of document.querySelectorAll('.source-photo'))button.addEventListener('click',()=>{
+document.addEventListener('click',event=>{
+ const button=event.target.closest('.source-photo');if(!button)return;
  const pageId='page-'+button.dataset.sourcePage.padStart(3,'0');
  const index=links.findIndex(link=>link.closest('.log-page').id===pageId);
  if(index>=0){sourceReturnFocus=button;openPhoto(index);}

@@ -1,36 +1,49 @@
 import {buildJournalModel} from '../scripts/journal-model.js';
+import {validateArtifact,renderArtifact} from '../scripts/artifacts.js';
 import {readFileSync,writeFileSync,renameSync,existsSync} from 'node:fs';
+import {randomUUID} from 'node:crypto';
 import {resolve} from 'node:path';
 import {renderEntryContext} from '../scripts/render-context.js';
-export function localEditor({correctionsFile=resolve('content/corrections.json'),directory=resolve('dist')}={}){
+export function localEditor({correctionsFile=resolve('content/corrections.json'),artifactsFile=resolve('content/artifacts.json'),directory=resolve('dist')}={}){
  const read=()=>JSON.parse(readFileSync(correctionsFile,'utf8'));
+ const readArtifacts=()=>existsSync(artifactsFile)?JSON.parse(readFileSync(artifactsFile,'utf8')):{version:1,items:[]};
  return async(req,res,path)=>{
   if(!path.startsWith('/__local/'))return false;
   const reply=(status,body)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(body));};
   if(!/^127\.0\.0\.1:\d+$/.test(req.headers.host||'')){reply(403,{error:'Local access only'});return true;}
-  if(req.method==='GET'&&['/__local/editor.js','/__local/editor.css','/__local/uncertainty.js'].includes(path)){
+  if(req.method==='GET'&&['/__local/editor.js','/__local/editor.css','/__local/uncertainty.js','/__local/artifacts.js'].includes(path)){
    res.writeHead(200,{'Content-Type':path.endsWith('.js')?'text/javascript':'text/css','Cache-Control':'no-store'});res.end(readFileSync(resolve('local',path.split('/').at(-1))));return true;
   }
-  if(path!=='/__local/entries'){reply(404,{error:'Not found'});return true;}
-  if(req.method==='GET'){reply(200,read());return true;}
+  if(!['/__local/entries','/__local/artifacts'].includes(path)){reply(404,{error:'Not found'});return true;}
+  if(req.method==='GET'){reply(200,path==='/__local/artifacts'?readArtifacts():read());return true;}
   if(req.method!=='POST'){reply(405,{error:'Method not allowed'});return true;}
   if(req.headers.origin!==`http://${req.headers.host}`||req.headers['content-type']!=='application/json'){reply(403,{error:'Save from the local editor only'});return true;}
   try{
-   let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>100000){reply(413,{error:'Entry too long'});return true;}}
-   const input=JSON.parse(body);
+   let body='';for await(const chunk of req){body+=chunk;if(Buffer.byteLength(body)>100000){reply(413,{error:'Content too long'});return true;}}
+   let input;try{input=JSON.parse(body);}catch{reply(400,{error:'Invalid save data.'});return true;}
    const context=JSON.parse(readFileSync('content/entry-context.json'));
    if(existsSync('content/weekly-context.json'))context.weekly=JSON.parse(readFileSync('content/weekly-context.json'));
-   const source=readFileSync('web/index.html','utf8');
-   const grouping=JSON.parse(readFileSync('content/entry-groups.json'));
-   const model=buildJournalModel(source,context,grouping);
-   if(!model.passages.has(input.id)||typeof input.text!=='string'||!input.text.trim()||input.text.length>50000||typeof input.note!=='string'||input.note.length>10000){reply(400,{error:'A known entry and nonempty text are required'});return true;}
-   const corrections=read();
-   if((corrections[input.id]?.updated_at||null)!==(input.revision||null)){reply(409,{error:'This entry changed in another tab. Reload before editing.'});return true;}
-   corrections[input.id]={text:input.text,note:input.note,updated_at:new Date().toISOString()};
-   const html=renderEntryContext(source,context,corrections,grouping);
-   writeFileSync(correctionsFile+'.tmp',JSON.stringify(corrections,null,2)+'\n');renameSync(correctionsFile+'.tmp',correctionsFile);
-   writeFileSync(resolve(directory,'index.html'),html);
-   reply(200,corrections[input.id]);
+   const source=readFileSync('web/index.html','utf8'),grouping=JSON.parse(readFileSync('content/entry-groups.json'));
+   const model=buildJournalModel(source,context,grouping),corrections=read(),artifacts=readArtifacts();
+   let record,file,saved,response;
+   if(path==='/__local/artifacts'){
+    const error=validateArtifact(input,model.pages);if(error){reply(400,{error});return true;}
+    const existing=input.id?artifacts.items.find(item=>item.id===input.id):null;
+    if(input.id&&!existing){reply(404,{error:'Artifact not found.'});return true;}
+    if(existing&&existing.page!==input.page){reply(400,{error:'An artifact stays with its source page.'});return true;}
+    if((existing?.updated_at||null)!==(input.revision||null)){reply(409,{error:'This artifact changed in another tab. Reload before editing.'});return true;}
+    const now=new Date().toISOString();
+    record={id:existing?.id||'A-'+randomUUID(),page:input.page,type:input.type,title:input.title.trim(),caption:input.caption,crop:input.crop,created_at:existing?.created_at||now,updated_at:now};
+    if(existing)artifacts.items[artifacts.items.indexOf(existing)]=record;else artifacts.items.push(record);
+    file=artifactsFile;saved=artifacts;response={artifact:record,html:renderArtifact(record,model.pages.get(record.page))};
+   }else{
+    if(!model.passages.has(input.id)||typeof input.text!=='string'||!input.text.trim()||input.text.length>50000||typeof input.note!=='string'||input.note.length>10000){reply(400,{error:'A known entry and nonempty text are required'});return true;}
+    if((corrections[input.id]?.updated_at||null)!==(input.revision||null)){reply(409,{error:'This entry changed in another tab. Reload before editing.'});return true;}
+    record={text:input.text,note:input.note,updated_at:new Date().toISOString()};corrections[input.id]=record;file=correctionsFile;saved=corrections;response=record;
+   }
+   const html=renderEntryContext(source,context,corrections,grouping,artifacts);
+   writeFileSync(file+'.tmp',JSON.stringify(saved,null,2)+'\n');renameSync(file+'.tmp',file);
+   writeFileSync(resolve(directory,'index.html'),html);reply(200,response);
   }catch{reply(500,{error:'Could not save. Your unsaved text is still in the editor.'});}
   return true;
  };

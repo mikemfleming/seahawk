@@ -4,9 +4,9 @@ import { readFileSync, statSync } from 'node:fs';
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.jpg': 'image/jpeg', '.png': 'image/png', '.js': 'text/javascript; charset=utf-8' };
-export function createApp({ directory = resolve('dist'), editing = false, correctionsFile } = {}) {
+export function createApp({ directory = resolve('dist'), editing = false, correctionsFile, artifactsFile } = {}) {
   const root = resolve(directory);
-  const editor=editing?localEditor({directory,correctionsFile}):null;
+  const editor=editing?localEditor({directory,correctionsFile,artifactsFile}):null;
   return createServer(async(req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'no-referrer');

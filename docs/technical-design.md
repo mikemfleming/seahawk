@@ -23,3 +23,11 @@
 ## Entries and passages
 
 Logical entries are composed of ordered, independently editable passages. `scripts/journal-model.js` derives this model from existing source transcriptions plus the explicit reviewed relationships in `content/entry-groups.json`. Original passage IDs and correction records stay intact. Previously unaddressable continuation fragments receive stable IDs. Date and historical context belong to the logical entry; text, family notes and source-photo references belong to each passage. Photo-page links and historical passage anchors are retained.
+
+## Artifacts
+
+Artifacts are manually authored content associated with a photographed page, independent of journal passages and family notes. `content/artifacts.json` stores stable UUID-based IDs, page, type (illustration, map/diagram, clipping, photograph, preserved object or other), title, optional caption, optional normalized source-photo crop, and creation/update timestamps. The build renders escaped static figure cards using SVG viewports of existing photographs; source images remain unchanged.
+
+The local editor provides page-level creation and artifact-level editing, including drag selection and whole-page reset. `/__local/artifacts` reads or saves records only in local editing mode, with the same origin checks and optimistic revision protection as corrections. Either kind of save rebuilds the page with both content stores, preserving the other content type. Public output has read-only artifact cards.
+
+**Artifact review:** All 79 source photographs were reviewed on November 23, 2026. The 73 displayed pages contain 25 cataloged artifacts across 21 pages. `content/artifact-review.json` records coverage and exclusions. Printed notebook decoration, reference tables, stains and ordinary handwriting marks were excluded.

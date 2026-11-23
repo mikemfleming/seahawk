@@ -1,3 +1,4 @@
+import {renderPageArtifacts} from './artifacts.js';
 import {formatEntryUpdated} from '../web/entry-updated.js';
 import {weeklyContextHTML} from './render-weekly-context.js';
 import {buildJournalModel} from './journal-model.js';
@@ -30,7 +31,7 @@ function entryContext(entry,data){
 export function renderContextBlock(page,data){
  return page.entries.map(entry=>entryHeading(entry)+entryContext(entry,data)).join('');
 }
-export function renderEntryContext(html,data,corrections={},grouping=entryGroups){
+export function renderEntryContext(html,data,corrections={},grouping=entryGroups,artifacts={items:[]}){
  if(!data)return html;
  const model=buildJournalModel(html,data,grouping);
  function renderGroup(group){
@@ -71,5 +72,6 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
   if(year&&!years.has(year))years.set(year,entry.date?'context-'+entry.id:'page-'+String(order).padStart(3,'0'));
  }
  const options=[...years].sort((a,b)=>a[0]-b[0]).map(([year,id])=>`<option value="${escape(id)}" data-year="${year}">${year}</option>`).join('');
+ html=renderPageArtifacts(html,artifacts,model.pages);
  return html.replace('<span class="page-total">',`<label for="year-jump">Year</label><select id="year-jump"><option value="">Choose year</option>${options}</select><span class="page-total">`);
 }

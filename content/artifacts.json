@@ -1,0 +1,380 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "A-page-002-boat-photograph",
+      "page": 2,
+      "type": "photograph",
+      "title": "A photograph of the Seahawk",
+      "caption": "A color photograph pasted into the ownership page shows the Seahawk beside a dock, with a person standing aboard and twin outboard motors at the stern.",
+      "crop": {
+        "x": 0.1922222222222222,
+        "y": 0.10833333333333334,
+        "width": 0.3055555555555556,
+        "height": 0.4166666666666667
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-026-shark-drawing",
+      "page": 26,
+      "type": "illustration",
+      "title": "Shark drawn above the fishing entries",
+      "caption": "A brown-and-gray shark drawn in profile across the top margin, with gill slits, dark fins and a long tail. The entries below describe encounters with sharks.",
+      "crop": {
+        "x": 0.3,
+        "y": 0.09166666666666666,
+        "width": 0.3333333333333333,
+        "height": 0.15833333333333333
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-030-kingfish-drawing",
+      "page": 30,
+      "type": "illustration",
+      "title": "Kingfish with measurement marks",
+      "caption": "A green fish drawn in profile along the lower margin, surrounded by handwritten dimension lines and measurements. A fishing hook is mounted just above it.",
+      "crop": {
+        "x": 0.23333333333333334,
+        "y": 0.7,
+        "width": 0.5166666666666667,
+        "height": 0.24166666666666667
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-030-recovered-hook",
+      "page": 30,
+      "type": "specimen",
+      "title": "Fishing hook preserved beside the kingfish drawing",
+      "caption": "A large curved metal hook attached above the fish illustration. The nearby entry describes finding a hook and a section of monofilament inside a kingfish.",
+      "crop": {
+        "x": 0.4777777777777778,
+        "y": 0.6083333333333333,
+        "width": 0.2388888888888889,
+        "height": 0.16666666666666666
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-031-colored-fish",
+      "page": 31,
+      "type": "illustration",
+      "title": "A colorful fish with a 22-pound annotation",
+      "caption": "A fish drawn in black ink with pink, green and yellow coloring fills the lower-right corner. A handwritten annotation above it records 22 pounds.",
+      "crop": {
+        "x": 0.5,
+        "y": 0.5833333333333334,
+        "width": 0.36666666666666664,
+        "height": 0.3416666666666667
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-033-bowrail-sketch",
+      "page": 33,
+      "type": "illustration",
+      "title": "Sketch of damage to the Seahawk’s bow",
+      "caption": "A pen sketch of the boat’s bow, with dashed lines showing the damaged bowrail and an arrow labeled “Bowrail dent/scratch.” It accompanies the July 25 entry describing a collision with an oil rig that tore off the bowrail and scraped the port bow.",
+      "crop": {
+        "x": 0.36,
+        "y": 0.085,
+        "width": 0.325,
+        "height": 0.145
+      },
+      "created_at": "2026-11-23T21:02:33.522Z",
+      "updated_at": "2026-11-23T21:02:33.522Z"
+    },
+    {
+      "id": "A-page-034-barracuda-drawing",
+      "page": 34,
+      "type": "illustration",
+      "title": "Barracuda from Learner Rig",
+      "caption": "A green-and-black barracuda drawn along the bottom of the page, with a pointed jaw, visible teeth and dark markings. The adjacent handwritten label reads “Learner Rig Barracuda.”",
+      "crop": {
+        "x": 0.23333333333333334,
+        "y": 0.6416666666666667,
+        "width": 0.4722222222222222,
+        "height": 0.2
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-034-jaw-fragment",
+      "page": 34,
+      "type": "specimen",
+      "title": "A jaw fragment beside the barracuda drawing",
+      "caption": "A small pale jaw fragment with several pointed teeth is attached beside the labeled barracuda illustration.",
+      "crop": {
+        "x": 0.6888888888888889,
+        "y": 0.7166666666666667,
+        "width": 0.16666666666666666,
+        "height": 0.14166666666666666
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-037-green-fish",
+      "page": 37,
+      "type": "illustration",
+      "title": "Green fish in the top margin",
+      "caption": "A slender green fish with dark fins and a forked tail stretches across the upper margin, beside a short handwritten label.",
+      "crop": {
+        "x": 0.37222222222222223,
+        "y": 0.09166666666666666,
+        "width": 0.4111111111111111,
+        "height": 0.125
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-040-sailfish-drawing",
+      "page": 40,
+      "type": "illustration",
+      "title": "Sailfish sketch above the entry",
+      "caption": "An uncolored pen drawing of a billfish with a long pointed bill and a raised sail-like dorsal fin. It sits above the continued fishing account.",
+      "crop": {
+        "x": 0.28888888888888886,
+        "y": 0.058333333333333334,
+        "width": 0.23333333333333334,
+        "height": 0.19166666666666668
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-041-rig-and-birds",
+      "page": 41,
+      "type": "map",
+      "title": "An offshore structure and birds",
+      "caption": "A small sketch shows an offshore structure above the water, with birds overhead. The handwritten notes mention frigate birds, estimate about 50, and say to expect kings here.",
+      "crop": {
+        "x": 0.4666666666666667,
+        "y": 0.7,
+        "width": 0.36666666666666664,
+        "height": 0.19166666666666668
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-042-crab-doodle",
+      "page": 42,
+      "type": "illustration",
+      "title": "Crab sketch in the margin",
+      "caption": "A small pen sketch of a crab with raised claws and short legs sits in the right margin beside an entry about catching blue crabs.",
+      "crop": {
+        "x": 0.7222222222222222,
+        "y": 0.23333333333333334,
+        "width": 0.09444444444444444,
+        "height": 0.13333333333333333
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-046-mounted-hook",
+      "page": 46,
+      "type": "specimen",
+      "title": "A large fishing hook mounted in the journal",
+      "caption": "A large curved metal fishing hook, with a short attachment at its eye, is fixed to the page beside the end of the fishing account and a pasted note.",
+      "crop": {
+        "x": 0.2111111111111111,
+        "y": 0.325,
+        "width": 0.3,
+        "height": 0.25
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-046-fishing-prescription",
+      "page": 46,
+      "type": "other",
+      "title": "A fishing prescription on a doctor’s notepad",
+      "caption": "A note on Kamuela Medical Associates prescription stationery is pasted into the journal. Addressed to Edmund Fleming and signed by Jed A. Groom, M.D., it reads “Never Stop fishing” with “for better fishhooks” beneath.",
+      "crop": {
+        "x": 0.36666666666666664,
+        "y": 0.43333333333333335,
+        "width": 0.4111111111111111,
+        "height": 0.4666666666666667
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-047-long-tailed-shark",
+      "page": 47,
+      "type": "illustration",
+      "title": "Long-tailed shark sketch",
+      "caption": "A pen sketch of a shark with an exceptionally long upper tail curves down the upper-right side of the page, beside the fishing notes.",
+      "crop": {
+        "x": 0.5277777777777778,
+        "y": 0.09166666666666666,
+        "width": 0.3,
+        "height": 0.375
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-051-shark-outline",
+      "page": 51,
+      "type": "illustration",
+      "title": "Small shark outline above the entries",
+      "caption": "A simple shark drawn in profile in the top margin, with gill marks, two dorsal fins and a forked tail.",
+      "crop": {
+        "x": 0.43333333333333335,
+        "y": 0.075,
+        "width": 0.1388888888888889,
+        "height": 0.10833333333333334
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-054-seahorse",
+      "page": 54,
+      "type": "specimen",
+      "title": "A dried seahorse preserved on the page",
+      "caption": "A small dried seahorse with a curled tail is attached near the lower entry. The handwritten account nearby mentions finding a seahorse.",
+      "crop": {
+        "x": 0.5777777777777777,
+        "y": 0.7583333333333333,
+        "width": 0.12777777777777777,
+        "height": 0.15
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-058-fishing-spot-diagram",
+      "page": 58,
+      "type": "map",
+      "title": "Landmarks for a fishing spot south of OTEC",
+      "caption": "A hand-drawn navigation diagram uses the double stacks at OTEC, a light and a brown shed as visual references. Arrows and notes mark a 35-fathom fishing area and a waypoint on the Lowrance unit; the accompanying directions describe lining up the landmarks.",
+      "crop": {
+        "x": 0.2777777777777778,
+        "y": 0.5166666666666667,
+        "width": 0.5444444444444444,
+        "height": 0.31666666666666665
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-062-blue-fish",
+      "page": 62,
+      "type": "illustration",
+      "title": "Blue-ink fish in the top margin",
+      "caption": "A blue-ink fish drawn in profile above the entries, with a blunt head, long dorsal fin and deeply forked tail.",
+      "crop": {
+        "x": 0.40555555555555556,
+        "y": 0.06666666666666667,
+        "width": 0.2,
+        "height": 0.14166666666666666
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-065-fishing-route",
+      "page": 65,
+      "type": "map",
+      "title": "Fishing route around a point and buoy",
+      "caption": "A hand-drawn coastal fishing diagram below the entry shows a point, shaded water, a buoy and curved arrows. Handwritten labels identify rocks and a marlin strike.",
+      "crop": {
+        "x": 0.3,
+        "y": 0.65,
+        "width": 0.3055555555555556,
+        "height": 0.26666666666666666
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-067-billfish-fight",
+      "page": 67,
+      "type": "illustration",
+      "title": "Billfish and line above the fishing account",
+      "caption": "A loose pen sketch of a billfish amid looping lines and surface marks, with a long line extending to the right. It appears above the account of a hooked blue marlin.",
+      "crop": {
+        "x": 0.35555555555555557,
+        "y": 0.06666666666666667,
+        "width": 0.4888888888888889,
+        "height": 0.125
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-071-fish-outline",
+      "page": 71,
+      "type": "illustration",
+      "title": "Fish outline at the top of the page",
+      "caption": "A simple uncolored fish outline sits above the August entries, with a pointed head, tall dorsal fin and forked tail.",
+      "crop": {
+        "x": 0.43333333333333335,
+        "y": 0.075,
+        "width": 0.12222222222222222,
+        "height": 0.1
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-071-curved-arrow",
+      "page": 71,
+      "type": "map",
+      "title": "Curved arrow beside the marlin entry",
+      "caption": "A broad looping arrow is drawn in the left margin beside the August 30 marlin account. Its arrowhead points upward; the sketch has no written labels.",
+      "crop": {
+        "x": 0.15555555555555556,
+        "y": 0.5833333333333334,
+        "width": 0.1,
+        "height": 0.18333333333333332
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-076-lucky-boys-clipping",
+      "page": 76,
+      "type": "clipping",
+      "title": "“Lucky boys” newspaper clipping",
+      "caption": "A saved Woody’s Catch of the Week clipping shows Michael Fleming and Alex DuCote with their catch at Woody’s Sports Center. The printed caption describes the two five-and-a-half-year-old anglers fishing with guide Smokey Gaines. The surrounding printed text remains transcribed on this page.",
+      "crop": {
+        "x": 0.2388888888888889,
+        "y": 0.1,
+        "width": 0.4777777777777778,
+        "height": 0.7333333333333333
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-078-saltwater-angler-clipping",
+      "page": 78,
+      "type": "clipping",
+      "title": "Port Aransas Offshore newspaper page",
+      "caption": "A saved Saltwater Angler page combines fishing photographs, Deep Sea Roundup captions and local charter advertisements. One caption names Bill Hudspeth aboard Sea Hawk II with Capt. Ed Fleming. The printed text remains transcribed on this page.",
+      "crop": {
+        "x": 0.2222222222222222,
+        "y": 0.03333333333333333,
+        "width": 0.5166666666666667,
+        "height": 0.95
+      },
+      "created_at": "2026-11-23T21:07:27.391Z",
+      "updated_at": "2026-11-23T21:07:27.391Z"
+    }
+  ]
+}
