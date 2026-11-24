@@ -90,9 +90,10 @@ test('every entry retains its source text and has its own attached weather rathe
    if(group.passageIds.every(id=>corrections[id]?.deleted)){assert(!article);count++;continue;}
    assert(article,'Entry wrapper: '+entry.id);assert.equal(built.includes(`data-passage-id="${entry.id}"`),!corrections[entry.id]?.deleted);assert(article.includes('class="entry-text"'));
    const resolved=correctedEntryDate(model.groups.get(model.membership.get(entry.id)),corrections,data);
-   if(resolved.date){assert(article.indexOf('class="entry-text"')<article.indexOf('class="entry-context"'));if((resolved.weather_keys||[resolved.weather_key]).some(key=>data.weather[key]))assert(article.includes(resolved.weather_reference.name));else assert(article.includes('Historical weather is unavailable'));assert(!article.includes('class="entry-home-port"'));assert(!article.includes('class="context-note date-basis"'));assert(article.includes('Weather and music for'));}
+   const finalArticle=[...built.matchAll(/<article class="log-entry dated-context"[^>]*>[\s\S]*?<\/article>/g)].findLast(([section])=>section.includes(`data-entry-id="${group.id}"`))?.[0];
+   if(resolved.date){const article=finalArticle;assert(article.indexOf('class="entry-text"')<article.indexOf('class="entry-context"'));if((resolved.weather_keys||[resolved.weather_key]).some(key=>data.weather[key]))assert(article.includes(resolved.weather_reference.name));else assert(article.includes('Historical weather is unavailable'));assert(!article.includes('class="entry-home-port"'));assert(!article.includes('class="context-note date-basis"'));assert(article.includes('Weather and music for'));}
    count++;
   }
  }
- assert.equal(count,186);assert.doesNotMatch(built,/class="page-context"/);
+ assert.equal(count,187);assert.doesNotMatch(built,/class="page-context"/);
 });

@@ -3441,6 +3441,32 @@
           "layout_anchor": "65haliafterthedynellekxxxxcoastmarinaheadsouthtovvhadtobaitthemos"
         },
         {
+          "id": "E-page-054-june-10",
+          "label": "Undated passage",
+          "date": null,
+          "dates": [],
+          "end_date": null,
+          "basis": "Year inferred from chronological entries",
+          "resolved_heading": null,
+          "region": "Hawaii",
+          "weather_reference": {
+            "id": "kona",
+            "name": "Kona, Hawaii",
+            "latitude": 19.64016,
+            "longitude": -155.99907,
+            "kind": "home-port",
+            "precision": "Home port supplied by the owner",
+            "region": "Hawaii"
+          },
+          "weather_key": null,
+          "weather_keys": [],
+          "chart_date": null,
+          "chart_dates": [],
+          "weather_status": "unavailable",
+          "chart_status": "unavailable",
+          "layout_anchor": "killedwhatabummerjohngoearlytooxxworktheparadiseschool"
+        },
+        {
           "id": "E-39d20371d1",
           "label": "6/26/???",
           "date": "2000-06-26",

@@ -9,7 +9,7 @@ const model=buildJournalModel(raw,data,config);
 test('grouping retains every source word, original passage ID and original photo page',()=>{
  assert.equal(model.pages.size,73);
  for(const page of model.pages.values())assert.equal(searchableHTML(page.pieces.map(piece=>piece.html).join('')).text,searchableHTML(page.body).text,'Source page '+page.order);
- const original=Object.values(data.pages).flatMap(page=>page.entries.map(entry=>entry.id));assert.equal(original.length,186);
+ const original=Object.values(data.pages).flatMap(page=>page.entries.map(entry=>entry.id));assert.equal(original.length,187);
  for(const id of original)assert(model.passages.has(id));
  const assigned=[...model.groups.values()].flatMap(group=>group.passageIds);assert.equal(new Set(assigned).size,model.passages.size);assert.equal(assigned.length,model.passages.size);
  assert.equal(model.membership.get('P-page-029-prefix'),'E-a0b22e406e');
@@ -20,13 +20,20 @@ test('grouping retains every source word, original passage ID and original photo
 test('complete entries render continuations once, retain old anchors and show context only after the last passage',()=>{
  const html=renderEntryContext(raw,data,{});
  const group=html.match(/<article[^>]*id="context-E-a0b22e406e"[^>]*>[\s\S]*?<\/article>/)[0];
- assert.match(group,/Great Party at house last night/);assert.match(group,/Continued on page 29/);
+ const continuation=html.match(/<article[^>]*>[\s\S]*?<\/article>/g).find(article=>article.includes('id="context-P-page-029-prefix"'));
+ assert.doesNotMatch(group,/Great Party at house last night|class="entry-context"/);
+ assert.match(continuation,/Great Party at house last night/);
+ assert.match(continuation,/Continued on page 29/);
  assert.equal((html.match(/Great Party at house last night/g)||[]).length,1);
- assert(group.indexOf('Great Party')<group.indexOf('class="entry-context"'));
- assert.equal((group.match(/class="entry-context"/g)||[]).length,1);
+ assert(continuation.indexOf('Great Party')<continuation.indexOf('class="entry-context"'));
+ for(const page of [51,52,53]){
+  const section=html.match(new RegExp('<section class="log-page" id="page-0'+page+'"[\\s\\S]*?</section>'))[0];
+  assert.match(section,/data-entry-id="E-a73bd50f4b"/);
+  assert.match(section,new RegExp('data-source-page="'+page+'"'));
+ }
  for(const id of model.passages.keys())assert.equal((html.match(new RegExp('id="context-'+id+'"','g'))||[]).length,1,'Preserved anchor '+id);
  for(const page of model.pages.keys())assert(html.includes('id="page-'+String(page).padStart(3,'0')+'"'));
- assert.match(html,/href="#context-P-page-029-prefix">Read this passage in the complete entry/);
+ assert.match(continuation,/href="#context-E-a0b22e406e"/);
 });
 test('each passage correction, family note and revision stays independent within a complete entry',()=>{
  const corrections={
@@ -34,8 +41,8 @@ test('each passage correction, family note and revision stays independent within
   'P-page-029-prefix':{text:'Second corrected passage <unsafe>.',note:'Second family note.',updated_at:'2026-11-23T15:00:00Z'}
  };
  const html=renderEntryContext(raw,data,corrections),group=html.match(/<article[^>]*id="context-E-a0b22e406e"[^>]*>[\s\S]*?<\/article>/)[0];
- for(const text of ['First corrected passage.','Second corrected passage &lt;unsafe&gt;.','First family note.','Second family note.'])assert(group.includes(text));
- assert.match(group,/datetime="2026-11-23T15:00:00Z"/);assert(!group.includes('<unsafe>'));
+ for(const text of ['First corrected passage.','Second corrected passage &lt;unsafe&gt;.','First family note.','Second family note.'])assert(html.includes(text));
+ assert.match(html,/datetime="2026-11-23T15:00:00Z"/);assert(!html.includes('<unsafe>'));
  const saved=JSON.parse(readFileSync('content/corrections.json'));
  for(const id of Object.keys(saved))assert(model.passages.has(id),'Saved correction remains attached: '+id);
 });

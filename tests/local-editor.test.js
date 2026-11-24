@@ -37,7 +37,7 @@ test('local corrections persist safely, reject foreign/stale writes, and do not 
  assert.equal((await save({id:dateInput.id,text:dated.text,note:'Note-only update',revision:dated.updated_at})).status,200);
  assert.deepEqual(JSON.parse(readFileSync(correctionsFile))[dateInput.id].date_override,dateInput.date_override);
  const persisted=JSON.parse(readFileSync(correctionsFile));assert.equal(persisted.E003.text,input.text);assert.equal(persisted['P-page-029-prefix'].text,continuation.text);
- const complete=readFileSync(join(directory,'index.html'),'utf8').match(/<article[^>]*id="context-E-a0b22e406e"[^>]*>[\s\S]*?<\/article>/)[0];assert(complete.includes(continuation.text));assert(complete.includes(continuation.note));
+ const complete=readFileSync(join(directory,'index.html'),'utf8').match(/<article[^>]*>[\s\S]*?<\/article>/g).find(article=>article.includes('id="context-P-page-029-prefix"'));assert(complete.includes(continuation.text));assert(complete.includes(continuation.note));
  assert.equal((await save(continuation)).status,409);
  assert.match(await(await fetch(origin)).text(),/\/__local\/editor.js/);
  const editorScript=await fetch(origin+'/__local/editor.js');

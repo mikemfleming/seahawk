@@ -36,38 +36,42 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
  if(!data)return html;
  const model=buildJournalModel(html,data,grouping);
  const absorbed=new Set((grouping.absorbed_passages||[]).filter(item=>corrections[item.into]).map(item=>item.id));
- function renderGroup(group){
-  if(group.passageIds.every(id=>corrections[id]?.deleted||absorbed.has(id)))return '';
+ const visiblePassages=new Map([...model.groups].map(([id,group])=>[
+  id,group.passageIds.filter(passage=>!corrections[passage]?.deleted&&!absorbed.has(passage))
+ ]));
+ function renderGroup(group,page,ids){
+  const visible=visiblePassages.get(group.id);
+  const firstPage=model.passages.get(visible[0]).page;
+  const lastPage=model.passages.get(visible.at(-1)).page;
   const entry=correctedEntryDate(group,corrections,data);
   const title=entry.date?day(entry.date):'Journal note';
   const year=entry.date?.slice(0,4)||entry.period?.[0]||'';
-  const parts=group.passageIds.map((id,index)=>{
-   if(corrections[id]?.deleted)return '';
-   if(absorbed.has(id))return `<span id="context-${escape(id)}" hidden></span>`;
+  const parts=ids.map(id=>{
    const passage=model.passages.get(id),correction=corrections[id];
    const text=correction?correction.text.split(/\n\s*\n/).map(paragraph=>`<p class="passage">${escape(paragraph)}</p>`).join('\n'):passage.html;
    const note=correction?.note?.trim()?`<p class="entry-clarification"><strong>Note:</strong> ${escape(correction.note)}</p>`:'';
    return `<div class="entry-passage" data-passage-id="${escape(id)}" data-entry-id="${escape(group.id)}" data-source-page="${passage.page}"${id!==group.id?` id="context-${escape(id)}"`:''}>
-    ${group.passageIds.slice(0,index).some(previous=>!corrections[previous]?.deleted&&!absorbed.has(previous))?`<p class="continuation-divider">Continued on page ${passage.page}</p>`:''}
+    ${id!==visible[0]?`<p class="continuation-divider">Continued on page ${passage.page}</p>`:''}
     <div class="passage-source"><span>From page ${passage.page}</span><button type="button" class="source-photo" data-source-page="${passage.page}" aria-label="View original page ${passage.page}">View original ↗</button></div>
     <div class="entry-text">${text}</div>${note}</div>`;
   }).join('\n');
   const latest=group.passageIds.map(id=>corrections[id]?.updated_at).filter(value=>formatEntryUpdated(value)).sort((a,b)=>Date.parse(b)-Date.parse(a))[0];
   const updated=`<p class="entry-updated">${latest?`Last updated <time datetime="${escape(latest)}">${escape(formatEntryUpdated(latest))}</time>`:'Not yet updated'}</p>`;
-  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-entry-date="${escape(entry.date||'')}" data-entry-end-date="${escape(entry.end_date||'')}" data-date-revision="${escape(latestDateCorrection(group,corrections)?.date_updated_at||'')}" data-source-pages="${group.pages.join(',')}" id="context-${escape(group.id)}">${entryHeading(entry)}${parts}${entryContext(entry,data)}${updated}</article>`;
+  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-entry-date="${escape(entry.date||'')}" data-entry-end-date="${escape(entry.end_date||'')}" data-date-revision="${escape(latestDateCorrection(group,corrections)?.date_updated_at||'')}" data-source-pages="${group.pages.join(',')}" data-passage-count="${visible.length}"${page===firstPage?` id="context-${escape(group.id)}"`:''}>${page===firstPage?entryHeading(entry):`<p class="continuation-reference"><a href="#context-${escape(group.id)}">${escape(title)} ↗</a></p>`}${parts}${page===lastPage?entryContext(entry,data)+updated:''}</article>`;
  }
  html=html.replace(/<section class="log-page" id="page-(\d+)"[\s\S]*?<\/section>/g,(section,n)=>{
   const page=model.pages.get(Number(n));
   if(!page.entries.length&&!page.pieces.some(piece=>piece.id))return section;
+  const rendered=new Set();
   const contents=page.pieces.map(piece=>{
    if(!piece.id)return piece.html;
-   if(absorbed.has(piece.id)||corrections[piece.id]?.deleted&&piece.id!==model.membership.get(piece.id))return '';
+   if(corrections[piece.id]?.deleted)return '';
+   if(absorbed.has(piece.id))return `<span id="context-${escape(piece.id)}" hidden></span>`;
    const group=model.groups.get(model.membership.get(piece.id));
-   if(piece.id===group.id)return renderGroup(group);
-   if(group.passageIds.every(id=>corrections[id]?.deleted||absorbed.has(id)))return '';
-   const resolved=correctedEntryDate(group,corrections,data);
-   const title=resolved.date?day(resolved.date):'the journal note';
-   return `<p class="continuation-reference">This page continues ${escape(title)} from page ${group.pages[0]}. <a href="#context-${escape(piece.id)}">Read this passage in the complete entry ↗</a></p>`;
+   if(rendered.has(group.id))return '';
+   rendered.add(group.id);
+   const ids=visiblePassages.get(group.id).filter(id=>model.passages.get(id).page===page.order);
+   return renderGroup(group,page.order,ids);
   }).join('\n');
   const first=page.entries[0]?.id||page.pieces.find(piece=>piece.id)?.id;
   return section.replace(/<div class="transcription"[^>]*>[\s\S]*?<\/div>/,`<div class="transcription"${page.attrs} id="places-${escape(first)}">${contents}</div>`);

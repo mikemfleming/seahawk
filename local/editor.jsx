@@ -33,7 +33,8 @@ function updatePassage(article, result) {
     note.append(label, ' ' + result.note);
     text.after(note);
   }
-  const updated = article.closest('.log-entry').querySelector('.entry-updated');
+  const updated = [...document.querySelectorAll('.log-entry .entry-updated')].find(node =>
+    node.closest('.log-entry').dataset.entryId === article.dataset.entryId);
   const time = document.createElement('time');
   time.dateTime = result.updated_at;
   time.textContent = formatEntryUpdated(result.updated_at);
@@ -85,7 +86,7 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
         revision: record?.updated_at || null,
       });
       if (changed) {
-        history.replaceState(null, '', '#' + group.id);
+        history.replaceState(null, '', '#context-' + article.dataset.passageId);
         location.reload();
         return;
       }
@@ -164,7 +165,7 @@ function EditPassage({ article, records }) {
   const [editing, setEditing] = useState(false);
   const trigger = useRef(null);
   const group = article.closest('.log-entry');
-  const multiple = group.querySelectorAll('.entry-passage').length > 1;
+  const multiple = Number(group.dataset.passageCount) > 1;
   const id = article.dataset.passageId;
   return (
     <>
@@ -187,7 +188,7 @@ function LatestEntryJump() {
     for (const time of document.querySelectorAll('.log-entry .entry-updated time[datetime]')) {
       const date = Date.parse(time.dateTime);
       if (date > latestDate) {
-        latest = time.closest('.log-entry');
+        latest = document.getElementById('context-' + time.closest('.log-entry').dataset.entryId);
         latestDate = date;
       }
     }
