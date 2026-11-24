@@ -83,5 +83,5 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
  }
  const options=[...years].sort((a,b)=>a[0]-b[0]).map(([year,id])=>`<option value="${escape(id)}" data-year="${year}">${year}</option>`).join('');
  html=renderPageArtifacts(html,artifacts,model.pages);
- return html.replace('<span class="page-total">',`<label for="year-jump">Year</label><select id="year-jump"><option value="">Choose year</option>${options}</select><span class="page-total">`);
+ return html.replace('<span class="page-total">',`<label for="year-jump">Year</label><span class="jump-control"><select id="year-jump"><option value="">Choose year</option>${options}</select></span><span class="page-total">`);
 }

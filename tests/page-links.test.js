@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
-const source=readFileSync('web/gallery.js','utf8').split('function navigateTo(id)')[0];
+const source=readFileSync('web/gallery.js','utf8').split('export function navigateTo(id)')[0];
 function setup({local=true,hash='#page-042'}={}){
  const listeners={},frames=[],scrolls=[],jump={value:''},page={id:'page-042'};
  const parent={tagName:'DETAILS',open:false,parentElement:null};

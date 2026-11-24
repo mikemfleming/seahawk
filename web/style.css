@@ -19,6 +19,7 @@ footer { border-top: 1px solid #d7d7ca; padding-block: 30px 44px; font: 12px/1.6
 
 /* A small reading aid, rather than another application interface. */
 .page-tools { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px; width: min(900px, 100%); margin: 0 auto 26px; padding: 12px 16px; background: #f5f2e9; border-block: 1px solid #d7d7ca; font: 13px/1.4 system-ui, sans-serif; }
+.jump-control { display: contents; }
 .page-tools select { min-height: 40px; max-width: 165px; padding: 6px 10px; border: 1px solid #bfc5b8; border-radius: 4px; color: #263c34; background: #faf8f1; font: inherit; }
 .page-total { margin-left: auto; color: #6e746c; font-size: 12px; }
 .log-page { scroll-margin-top: 85px; }

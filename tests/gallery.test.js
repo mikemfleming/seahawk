@@ -12,7 +12,7 @@ test('73 Ricoh photos appear in original order with pages 5–10 omitted',()=>{
  for(const [index,section]of sections.entries()){assert.equal(Number(section[1]),expected[index]);assert.match(section[2],/^R\d+\.jpeg$/);assert(section[4].indexOf('<img ')<section[4].indexOf('class="transcription"'));assert.match(section[4],/class="transcription"[^>]*>\s*\S/);assert.match(section[4],/<img[^>]+width="\d+" height="\d+"/);}
 });
 test('transcriptions and historical data are static, with a local viewer script and no account APIs',()=>{
- assert.doesNotMatch(html,/<form|supabase|\/api\/|log.?in|sign.?in|archivist/i);assert.equal([...html.matchAll(/<script/g)].length,1);assert.match(html,/<script src="gallery.js" defer><\/script>/);assert.match(html,/script-src 'self'/);assert(existsSync('dist/gallery.js'));assert.match(html,/connect-src 'none'/);assert.match(html,/Captain Eddie/);
+ assert.doesNotMatch(html,/<form|supabase|\/api\/|log.?in|sign.?in|archivist/i);assert.equal([...html.matchAll(/<script/g)].length,1);assert.match(html,/<script src="gallery.js" type="module"><\/script>/);assert.match(html,/script-src 'self'/);assert(existsSync('dist/gallery.js'));assert.match(html,/connect-src 'none'/);assert.match(html,/Captain Eddie/);
  for(const src of html.matchAll(/(?:src|href)="([^"#]+)"/g)){if(src[1].startsWith('photos/')||src[1]==='style.css')assert(existsSync('dist/'+src[1]),`Missing ${src[1]}`);}
  assert.equal(readdirSync('dist/photos').length,79*3);
 });
@@ -31,7 +31,7 @@ test('any visitor can read the page and photos; obsolete auth and write endpoint
 
 test('jump menu contains only displayed pages and uncertainty highlights preserve the exact text',()=>{
  const pages=[...html.matchAll(/<section class="log-page" id="(page-\d+)"/g)].map(match=>match[1]);
- const choices=[...html.matchAll(/<option value="(page-\d+)">/g)].map(match=>match[1]);assert.deepEqual(choices,pages);assert.match(html,/id="photo-viewer"/);assert.match(html,/id="viewer-close"/);assert.match(html,/id="viewer-previous"/);assert.match(html,/id="viewer-next"/);assert.match(html,/id="viewer-position"/);assert.match(html,/class="back-to-top" href="#top"/);
+ const choices=[...html.matchAll(/<option value="(page-\d+)">/g)].map(match=>match[1]);assert.deepEqual(choices,pages);assert.match(html,/id="photo-viewer-root"/);assert.match(html,/class="back-to-top" href="#top"/);
  const text='First [Hudspeth?].\n\nThen [illegible] and &lt;unsafe&gt;.';
  const formatted=formatEscapedTranscription(text);assert(formatted.includes('<mark class="uncertain">[Hudspeth?]</mark>'));assert(formatted.includes('<mark class="uncertain">[illegible]</mark>'));assert(formatted.includes('&lt;unsafe&gt;'));assert.equal((formatted.match(/class="passage"/g)||[]).length,2);assert.equal(formatEscapedTranscription(formatted),formatted);assert.equal(enhanceGallery(html),html);
 });

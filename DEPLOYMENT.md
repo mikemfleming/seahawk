@@ -1,6 +1,6 @@
 # Publish the static notebook
 
-Run `npm test` and `npm run check:secrets`. Upload the generated `dist/` folder to a static host, or push the approved source to `main` to use the existing GitHub Pages workflow. Its URL remains `https://mikemfleming.github.io/seahawk/`.
+Run `npm ci`, `npm test` and `npm run check:secrets`. Upload the generated `dist/` folder to a static host, or push the approved source to `main` to use the existing GitHub Pages workflow. Its URL remains `https://mikemfleming.github.io/seahawk/`.
 
 No secrets, databases, Supabase functions, auth settings, or environment variables are required. The HTML uses relative photo and stylesheet paths, so it can be hosted at the domain root or a subdirectory.
 
@@ -10,4 +10,4 @@ The former Supabase archive remains untouched for recovery. Removing its remote 
 
 ## Local editing
 
-Use `npm start` for the loopback-only editing server; `npm run preview` is read-only. Commit `content/corrections.json` to publish approved corrections and notes. Local editor code lives in `local/`, outside the `web/` files copied into the Pages artifact.
+Use `npm start` for the loopback-only editing server; `npm run preview` is read-only. Commit `content/corrections.json` to publish approved corrections and notes. The React local editor is bundled separately and served only in editing mode. The Pages artifact contains the static journal markup and the React photo viewer.

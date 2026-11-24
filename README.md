@@ -2,13 +2,14 @@
 
 A single static page: 73 displayed Ricoh photographs in original page order (pages 5–10 omitted), with the transcription directly beneath each one. Select a photograph to open a larger copy. Brackets preserve uncertain readings.
 
-The public website has no login, database connection, editing interface, or runtime dependency. A separate local server supports corrections. A small local script adds page jumping and an accessible photo viewer with zoom, previous/next pages and arrow-key navigation; the photographs and text remain readable without it. All photographs and text are part of the page's static files. All 79 original full-resolution exports remain untouched.
+The public website has no login, database connection, or editing interface. A separate local server supports corrections. React adds page jumping and an accessible photo viewer with zoom, previous/next pages and arrow-key navigation; the photographs and text remain readable without it. All photographs and text are part of the page's static files. All 79 original full-resolution exports remain untouched.
 
 ## Run locally
 
-Use Node.js 24, as specified in `.nvmrc`. If you use nvm, run `nvm install` to install Node 24 or `nvm use` to select it if it is already installed. No npm dependencies or environment variables are required.
+Use Node.js 24, as specified in `.nvmrc`. If you use nvm, run `nvm install` to install Node 24 or `nvm use` to select it if it is already installed. No environment variables are required.
 
 ```sh
+npm install
 npm start
 ```
 
@@ -32,7 +33,7 @@ To rebuild these files from the private intake, install Pillow for a Python inte
 GALLERY_PYTHON=/path/to/python3 node scripts/export-gallery.js
 ```
 
-Optional positional arguments specify the intake folder and archive snapshot. The exporter verifies all original photo hashes, retains printed text, carries forward confirmed passage corrections, escapes text for HTML, and preserves manifest order. The ordinary build does not require Python, the private intake, or credentials.
+Optional positional arguments specify the intake folder and archive snapshot. The exporter verifies all original photo hashes, retains printed text, carries forward confirmed passage corrections, escapes text for HTML, and preserves manifest order. The ordinary build uses esbuild to bundle the React reader and local editor. It does not require Python, the private intake, or credentials.
 
 The previous application and its uncommitted source are preserved under ignored `data/intake/seahawk/previous-app/`, with an additional source archive and patch alongside it. Existing remote Supabase records and accounts have not been deleted.
 

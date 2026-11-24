@@ -15,5 +15,12 @@
     "check:secrets": "node scripts/check-secrets.js",
     "context:refresh": "node scripts/prepare-context.js",
     "preview": "node scripts/build.js && node server.js"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
   }
 }

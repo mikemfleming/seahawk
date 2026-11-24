@@ -40,6 +40,9 @@ test('local corrections persist safely, reject foreign/stale writes, and do not 
  const complete=readFileSync(join(directory,'index.html'),'utf8').match(/<article[^>]*id="context-E-a0b22e406e"[^>]*>[\s\S]*?<\/article>/)[0];assert(complete.includes(continuation.text));assert(complete.includes(continuation.note));
  assert.equal((await save(continuation)).status,409);
  assert.match(await(await fetch(origin)).text(),/\/__local\/editor.js/);
+ const editorScript=await fetch(origin+'/__local/editor.js');
+ assert.equal(editorScript.status,200);
+ assert.match(await editorScript.text(),/Edit journal entry/);
  assert.doesNotMatch(readFileSync('dist/index.html','utf8'),/__local|edit-entry|entry-editor/);
  const publicApp=createApp();publicApp.listen(0,'127.0.0.1');await once(publicApp,'listening');t.after(()=>new Promise(done=>publicApp.close(done)));
  const publicOrigin=`http://127.0.0.1:${publicApp.address().port}`;

@@ -12,8 +12,8 @@ export function localEditor({correctionsFile=resolve('content/corrections.json')
   if(!path.startsWith('/__local/'))return false;
   const reply=(status,body)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(body));};
   if(!/^127\.0\.0\.1:\d+$/.test(req.headers.host||'')){reply(403,{error:'Local access only'});return true;}
-  if(req.method==='GET'&&['/__local/editor.js','/__local/editor.css','/__local/uncertainty.js','/__local/artifacts.js'].includes(path)){
-   res.writeHead(200,{'Content-Type':path.endsWith('.js')?'text/javascript':'text/css','Cache-Control':'no-store'});res.end(readFileSync(resolve('local',path.split('/').at(-1))));return true;
+  if(req.method==='GET'&&['/__local/editor.js','/__local/editor.css'].includes(path)){
+   res.writeHead(200,{'Content-Type':path.endsWith('.js')?'text/javascript':'text/css','Cache-Control':'no-store'});res.end(readFileSync(path.endsWith('.js') ? 'node_modules/.cache/seahawk/editor.js' : 'local/editor.css'));return true;
   }
   if(!['/__local/entries','/__local/artifacts'].includes(path)){reply(404,{error:'Not found'});return true;}
   if(req.method==='GET'){reply(200,path==='/__local/artifacts'?readArtifacts():read());return true;}
