@@ -46,7 +46,7 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
    if(absorbed.has(id))return `<span id="context-${escape(id)}" hidden></span>`;
    const passage=model.passages.get(id),correction=corrections[id];
    const text=correction?correction.text.split(/\n\s*\n/).map(paragraph=>`<p class="passage">${escape(paragraph)}</p>`).join('\n'):passage.html;
-   const note=correction?.note?.trim()?`<p class="entry-clarification"><strong>Family note:</strong> ${escape(correction.note)}</p>`:'';
+   const note=correction?.note?.trim()?`<p class="entry-clarification"><strong>Note:</strong> ${escape(correction.note)}</p>`:'';
    return `<div class="entry-passage" data-passage-id="${escape(id)}" data-entry-id="${escape(group.id)}" data-source-page="${passage.page}"${id!==group.id?` id="context-${escape(id)}"`:''}>
     ${group.passageIds.slice(0,index).some(previous=>!corrections[previous]?.deleted&&!absorbed.has(previous))?`<p class="continuation-divider">Continued on page ${passage.page}</p>`:''}
     <div class="passage-source"><span>From page ${passage.page}</span><button type="button" class="source-photo" data-source-page="${passage.page}" aria-label="View original page ${passage.page}">View original ↗</button></div>

@@ -56,7 +56,7 @@ Dates are resolved across the chronological book, using photograph-reviewed year
 
 ## Local corrections and the public website
 
-`npm start` enables local editing. Select **Edit entry**, correct the transcription or add an optional family clarification, then select **Save correction**. Changes are stored in `content/corrections.json` and survive restarts. Original text and photographs stay untouched. Commit corrections and push to `main` when ready to publish them. Your dad can use this editor on this computer; collaborating across computers currently requires sharing/synchronizing the project through Git, not the public website.
+`npm start` enables local editing. Select **Edit entry**, correct the transcription or add an optional note, then select **Save correction**. Changes are stored in `content/corrections.json` and survive restarts. Original text and photographs stay untouched. Commit corrections and push to `main` when ready to publish them. Your dad can use this editor on this computer; collaborating across computers currently requires sharing/synchronizing the project through Git, not the public website.
 
 `npm run preview` serves the same read-only result as GitHub Pages. `npm run build` produces `dist/` with no editing controls or save API. The `local/` editor directory is never copied into that artifact.
 
@@ -76,7 +76,7 @@ The economy panel also shows the S&P 500 price-index close and its change from t
 
 `content/entry-groups.json` records reviewed continuation relationships. The build extracts stable passages from the source photographs, then renders each logical entry once with an ordered list of passages. The 185 original passage IDs remain correction keys. Seven formerly unaddressable fragments have additional stable IDs; the July 10/11 boundary on page 41 is split without changing source wording. Undated passages are not joined automatically.
 
-Each passage keeps its source page, correction and family note. A “View original” button opens the corresponding photo. Photographs and original page anchors stay in page order; continuation pages link back to the complete entry. Weather, music, historical events and the economy appear once after the final passage. The entry's last-updated label uses its most recently saved passage.
+Each passage keeps its source page, correction and note. A “View original” button opens the corresponding photo. Photographs and original page anchors stay in page order; continuation pages link back to the complete entry. Weather, music, historical events and the economy appear once after the final passage. The entry's last-updated label uses its most recently saved passage.
 
 The local editor edits a single passage at a time and names the complete entry and source pages in the dialog. Existing correction keys and notes remain independent. One correction already contained the page 29 continuation; `scripts/migrate-continuation-corrections.js --write` split that saved text at its reviewed paragraph boundary, preserving the exact combined wording and original timestamp. The original correction file is backed up under ignored `data/intake/seahawk/refactor-backups/`. The migration is idempotent and refuses to overwrite an existing destination correction. To correct a grouping later, change only the reviewed relationship in `content/entry-groups.json`.
 
@@ -84,7 +84,7 @@ The local editor edits a single passage at a time and names the complete entry a
 
 In the local editor, choose **Add artifact to page …** below a page’s transcription. Drag a rectangle over the photograph to select a drawing or detail, choose a type, add a title and optional caption, then **Save artifact**. **Use whole page** clears the crop. Saved cards have an **Edit artifact** button for later changes.
 
-Artifacts are independent page content stored in `content/artifacts.json`, with stable IDs, source page, type, title, caption, normalized crop and creation/update times. Crops display the existing source photograph without altering it or creating another image copy. Transcription corrections and family notes stay in `content/corrections.json`. Adding an artifact does not remove an existing illustration placeholder from the transcription.
+Artifacts are independent page content stored in `content/artifacts.json`, with stable IDs, source page, type, title, caption, normalized crop and creation/update times. Crops display the existing source photograph without altering it or creating another image copy. Transcription corrections and notes stay in `content/corrections.json`. Adding an artifact does not remove an existing illustration placeholder from the transcription.
 
 Build and publish normally to include artifacts on the read-only public site. The public build includes the rendered cards and source-photo links, never editing controls or save endpoints.
 
@@ -96,7 +96,7 @@ Only context already prepared for the corrected date is displayed. Missing weath
 
 ## Deleting mistaken passages
 
-Open **Edit entry** or **Edit passage**, choose **Delete passage…**, then confirm **Delete passage**. This removes the selected text and its family note. If it was the last passage in an entry, the heading and historical context are also removed. Source photographs, artifacts and other passages stay in place. Publish normally to update the public website.
+Open **Edit entry** or **Edit passage**, choose **Delete passage…**, then confirm **Delete passage**. This removes the selected text and its note. If it was the last passage in an entry, the heading and historical context are also removed. Source photographs, artifacts and other passages stay in place. Publish normally to update the public website.
 
 Deletion replaces the saved correction with a minimal deletion marker so the initial import cannot recreate it on the next build. There is no restore control in the editor; committed history remains available through Git.
 

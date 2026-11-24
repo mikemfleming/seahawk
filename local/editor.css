@@ -27,3 +27,6 @@
 .delete-confirmation {border-top:1px solid #bca79b;margin-block:16px;padding-top:8px;}
 .delete-confirmation[hidden] {display:none;}
 .entry-editor .confirm-delete {background:#8a3126;color:white;border:1px solid #8a3126;}
+
+.local-editing .page-tools { flex-wrap: wrap; }
+.latest-entry-jump { min-height:40px;padding:6px 10px;border:1px solid #bfc5b8;border-radius:4px;background:#faf8f1;color:#263c34;font:inherit;cursor:pointer; }

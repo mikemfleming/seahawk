@@ -133,7 +133,7 @@ body>header { width:100%; padding:0; margin:0; }
  .opening-story {padding-block:24px;}
 }
 
-.entry-clarification {font:14px/1.7 system-ui,sans-serif;color:#526354;padding:10px 14px;border-left:2px solid #b8c4aa;background:#e9ece240;}
+.entry-clarification {white-space:pre-wrap;font:14px/1.7 system-ui,sans-serif;color:#526354;padding:10px 14px;border-left:2px solid #b8c4aa;background:#e9ece240;}
 
 .weekly-history,.weekly-economy {margin-top:6px;font:13px/1.7 system-ui,sans-serif;}
 .weekly-history summary,.weekly-economy summary {cursor:pointer;color:#426258;}

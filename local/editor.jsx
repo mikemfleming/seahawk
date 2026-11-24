@@ -28,7 +28,9 @@ function updatePassage(article, result) {
   if (result.note.trim()) {
     const note = document.createElement('p');
     note.className = 'entry-clarification';
-    note.textContent = 'Family note: ' + result.note;
+    const label = document.createElement('strong');
+    label.textContent = 'Note:';
+    note.append(label, ' ' + result.note);
     text.after(note);
   }
   const updated = article.closest('.log-entry').querySelector('.entry-updated');
@@ -138,11 +140,11 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
           </div>
         </label>
         <p className="highlight-help">Yellow marks uncertain or incomplete readings.</p>
-        <label>Clarification or family note (optional)<textarea name="note" rows={3} defaultValue={record?.note ?? ''} /></label>
+        <label>Note (optional)<textarea name="note" rows={3} defaultValue={record?.note ?? ''} /></label>
         <p role="status">{error}</p>
         {confirming ? (
           <div className="delete-confirmation">
-            <p>Delete this passage and its family note? The original photograph stays. This cannot be undone in the editor.</p>
+            <p>Delete this passage and its note? The original photograph stays. This cannot be undone in the editor.</p>
             <button type="button" className="confirm-delete" disabled={busy} onClick={deletePassage}>Delete passage</button>
             <button type="button" className="keep-passage" ref={keepPassage} disabled={busy} onClick={() => setConfirming(false)}>Keep passage</button>
           </div>
@@ -176,6 +178,42 @@ function EditPassage({ article, records }) {
   );
 }
 
+function LatestEntryJump() {
+  const [message, setMessage] = useState('');
+
+  function jump() {
+    let latest = null;
+    let latestDate = -Infinity;
+    for (const time of document.querySelectorAll('.log-entry .entry-updated time[datetime]')) {
+      const date = Date.parse(time.dateTime);
+      if (date > latestDate) {
+        latest = time.closest('.log-entry');
+        latestDate = date;
+      }
+    }
+    if (!latest) {
+      setMessage('No entries have been updated yet.');
+      return;
+    }
+    setMessage('');
+    history.replaceState(null, '', '#' + latest.id);
+    // Reuse the reader's anchor navigation even when this entry is already in the URL.
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    const heading = latest.querySelector('h3, h4');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
+  }
+
+  return (
+    <>
+      <button type="button" className="latest-entry-jump" onClick={jump}>Last updated entry</button>
+      {message && <span className="local-mode" role="status">{message}</span>}
+    </>
+  );
+}
+
 const toolbarSlot = appendSlot(document.querySelector('.page-tools'));
 try {
   const edits = fetch('/__local/entries').then(response => {
@@ -191,6 +229,7 @@ try {
     createPortal(<EditPassage article={article} records={records} />, appendSlot(article), article.dataset.passageId));
   mountControl(toolbarSlot, <>
     <span className="local-mode">Local editing</span>
+    <LatestEntryJump />
     {passageControls}
     {artifactControls}
   </>);
