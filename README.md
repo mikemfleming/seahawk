@@ -6,7 +6,7 @@ The public website has no login, database connection, editing interface, or runt
 
 ## Run locally
 
-Use Node 22.12 or newer. No package installation or environment variables are required.
+Use Node.js 24, as specified in `.nvmrc`. If you use nvm, run `nvm install` to install Node 24 or `nvm use` to select it if it is already installed. No npm dependencies or environment variables are required.
 
 ```sh
 npm start
