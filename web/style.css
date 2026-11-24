@@ -127,7 +127,7 @@ body>header { width:100%; padding:0; margin:0; }
 @media(max-width:600px){
  .journal-banner {height:300px;}
  .banner-art {width:100%;left:0;}
- .banner-title {padding:28px 20px;background:linear-gradient(90deg,#f5f2e9db,#f5f2e970 70%,#f5f2e92b);}
+ .banner-title {justify-content:flex-end;padding:28px 20px;background:linear-gradient(0deg,#f5f2e9f2,#f5f2e99c 40%,#f5f2e91a 80%);}
  .banner-title .eyebrow {font-size:10px;letter-spacing:.14em;}
  .opening-story {padding-block:24px;}
 }
@@ -167,3 +167,13 @@ body>header { width:100%; padding:0; margin:0; }
 .page-artifact h3 { margin: .3rem 0 .6rem; }
 .artifact-caption { white-space: pre-wrap; }
 @media (max-width: 800px) { .page-artifacts { grid-column: 1 / -1; } }
+
+.book-reference { border: 1px solid #d7d7ca; padding: 20px 24px; margin-bottom: 48px; scroll-margin-top: 85px; }
+.book-reference>summary { cursor: pointer; font-size: 24px; line-height: 1.4; }
+.book-reference>summary span { display: block; margin: 4px 0 0 22px; font: 13px/1.6 system-ui,sans-serif; color: #6e746c; }
+.reference-intro { font: 14px/1.7 system-ui,sans-serif; color: #6e746c; margin-block: 20px 28px; }
+.front-matter { margin-bottom: 28px; }
+.front-matter>summary { cursor: pointer; font: 14px/1.6 system-ui,sans-serif; margin-bottom: 20px; }
+.book-reference .log-page { margin-bottom: 32px; }
+.book-reference .log-page:last-child { margin-bottom: 0; }
+@media(max-width:600px){.book-reference{padding:16px;}.book-reference>summary{font-size:21px;}}

@@ -98,3 +98,7 @@ Only context already prepared for the corrected date is displayed. Missing weath
 Open **Edit entry** or **Edit passage**, choose **Delete passage…**, then confirm **Delete passage**. This removes the selected text and its family note. If it was the last passage in an entry, the heading and historical context are also removed. Source photographs, artifacts and other passages stay in place. Publish normally to update the public website.
 
 Deletion replaces the saved correction with a minimal deletion marker so the initial import cannot recreate it on the next build. There is no restore control in the editor; committed history remains available through Git.
+
+## Boat reference pages
+
+The main journal begins on page 11. A collapsed **About the Seahawk** section near the beginning holds **The boat** (page 3) and **Original records** (page 4), including their source photographs and transcriptions. Its nested **Original cover and title page** disclosure holds pages 1–2. Page links and navigation automatically reveal the appropriate section; the enlarged photo viewer retains the original page order.

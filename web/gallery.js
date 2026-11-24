@@ -7,11 +7,15 @@ function syncJump() {
  jump.value=page?.id||'';
  if(yearJump)yearJump.value=[...yearJump.options].some(option=>option.value===target?.id)?target.id:'';
 }
+function revealTarget(target){
+ for(let parent=target?.parentElement;parent;parent=parent.parentElement)if(parent.tagName==='DETAILS')parent.open=true;
+}
 function hashTarget(){
  try{return document.getElementById(decodeURIComponent(location.hash.slice(1)));}catch{return null;}
 }
 function alignHash(){
  const target=hashTarget();if(!target)return;
+ revealTarget(target);
  target.scrollIntoView({behavior:'instant',block:'start'});syncJump();
 }
 syncJump();
@@ -34,6 +38,7 @@ for(const event of ['wheel','touchstart','pointerdown','keydown'])window.addEven
 settleInitialLink();
 function navigateTo(id) {
  const target=document.getElementById(id);if(!target)return;
+ revealTarget(target);
  history.replaceState(null,'',`#${id}`);
  const heading=target.matches('.log-page')?target.querySelector('h2'):target.querySelector('h3,h4');
  if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true});}
@@ -122,6 +127,7 @@ function pageInView() {
   const readingLine = Math.max(0, toolbarBottom) + 40;
   let selected = -1, distance = Infinity;
   for (const [index, link] of links.entries()) {
+    if(link.closest('details:not([open])')||!link.getClientRects().length)continue;
     const rect = link.closest('.log-page').getBoundingClientRect();
     const gap = readingLine < rect.top ? rect.top - readingLine : readingLine > rect.bottom ? readingLine - rect.bottom : 0;
     if (gap < distance) { distance = gap; selected = index; }
@@ -155,6 +161,7 @@ dialog.addEventListener('close', () => {
     const page = origin.closest('.log-page');
     history.replaceState(null, '', `#${page.id}`);
     syncJump();
+    revealTarget(page);
     page.scrollIntoView({ block: 'start', behavior: 'instant' });
   } else window.scrollTo(savedScroll.x, savedScroll.y);
 });
@@ -209,6 +216,7 @@ requestAnimationFrame(()=>requestAnimationFrame(()=>{
    const saved=JSON.parse(localStorage.getItem(readingKey)||'null');
    const page=saved&&document.getElementById(saved.id);
    if(page?.matches('.log-page')){
+    revealTarget(page);
     const offset=Number.isFinite(saved.offset)?Math.min(Math.max(0,saved.offset),page.offsetHeight):0;
     window.scrollTo(0,window.scrollY+page.getBoundingClientRect().top-90+offset);
     jump.value=page.id;
