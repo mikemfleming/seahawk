@@ -161,7 +161,7 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
   );
 }
 
-function EditPassage({ article, records }) {
+function EditPassage({ article, record, onSave }) {
   const [editing, setEditing] = useState(false);
   const trigger = useRef(null);
   const group = article.closest('.log-entry');
@@ -172,8 +172,8 @@ function EditPassage({ article, records }) {
       <button type="button" className="edit-entry" ref={trigger} onClick={() => setEditing(true)}>
         {multiple ? 'Edit passage' : 'Edit entry'}
       </button>
-      {editing && createPortal(<EntryEditor article={article} group={group} record={records[id]} multiple={multiple}
-        onSave={result => { records[id] = result; updatePassage(article, result); }}
+      {editing && createPortal(<EntryEditor article={article} group={group} record={record} multiple={multiple}
+        onSave={result => { updatePassage(article, result); onSave(id, result); }}
         onClose={() => { setEditing(false); trigger.current.focus({ preventScroll: true }); }} />, document.body)}
     </>
   );
@@ -215,6 +215,43 @@ function LatestEntryJump() {
   );
 }
 
+function CorrectionProgress({ passages, records }) {
+  const pending = new Map();
+  for (const { article } of passages) {
+    const { entryId, passageId } = article.dataset;
+    pending.set(entryId, pending.get(entryId) || !records[passageId]?.text?.trim());
+  }
+  const total = pending.size;
+  const remaining = [...pending.values()].filter(Boolean).length;
+  return (
+    <div className="correction-progress">
+      <progress aria-label="Entries corrected" value={total - remaining} max={total || 1} />
+      <span role="status">{remaining} of {total} entries left to correct</span>
+    </div>
+  );
+}
+
+function LocalEditor({ initialRecords, passages, artifactControls }) {
+  const [records, setRecords] = useState(initialRecords);
+
+  function saveCorrection(id, result) {
+    setRecords(current => ({ ...current, [id]: result }));
+  }
+
+  return (
+    <>
+      <span className="local-mode">Local editing</span>
+      <LatestEntryJump />
+      <CorrectionProgress passages={passages} records={records} />
+      {passages.map(({ article, slot }) => createPortal(
+        <EditPassage article={article} record={records[article.dataset.passageId]} onSave={saveCorrection} />,
+        slot, article.dataset.passageId,
+      ))}
+      {artifactControls}
+    </>
+  );
+}
+
 const toolbarSlot = appendSlot(document.querySelector('.page-tools'));
 try {
   const edits = fetch('/__local/entries').then(response => {
@@ -226,14 +263,10 @@ try {
   for (const paragraph of document.querySelectorAll('.entry-text .passage')) {
     renderUncertainty(paragraph, paragraph.textContent);
   }
-  const passageControls = [...document.querySelectorAll('.entry-passage')].map(article =>
-    createPortal(<EditPassage article={article} records={records} />, appendSlot(article), article.dataset.passageId));
-  mountControl(toolbarSlot, <>
-    <span className="local-mode">Local editing</span>
-    <LatestEntryJump />
-    {passageControls}
-    {artifactControls}
-  </>);
+  const passages = [...document.querySelectorAll('.entry-passage')].map(article => ({
+    article, slot: appendSlot(article),
+  }));
+  mountControl(toolbarSlot, <LocalEditor initialRecords={records} passages={passages} artifactControls={artifactControls} />);
 } catch (error) {
   mountControl(toolbarSlot, <span className="local-mode" role="status">{error.message}</span>);
 } finally {

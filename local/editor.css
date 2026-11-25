@@ -30,3 +30,5 @@
 
 .local-editing .page-tools { flex-wrap: wrap; }
 .latest-entry-jump { min-height:40px;padding:6px 10px;border:1px solid #bfc5b8;border-radius:4px;background:#faf8f1;color:#263c34;font:inherit;cursor:pointer; }
+.correction-progress { display: flex; align-items: center; gap: 8px; color: #426258; }
+.correction-progress progress { width: 76px; accent-color: #426258; }
