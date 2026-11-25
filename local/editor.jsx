@@ -119,8 +119,8 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
       <form onSubmit={submit}>
         <h2 id="entry-editor-title">{multiple ? 'Edit passage' : 'Edit journal entry'}</h2>
         <p className="edit-context">
-          Page {article.dataset.sourcePage} · Part of {group.dataset.entryTitle}
-          {multiple && ' · Source pages ' + group.dataset.sourcePages.replaceAll(',', ', ')}
+          {multiple ? `Page ${article.dataset.sourcePage} · Part of ${group.dataset.entryTitle}` : group.dataset.entryTitle}
+          {' · Source ' + (group.dataset.sourcePages.includes(',') ? 'pages ' : 'page ') + group.dataset.sourcePages.replaceAll(',', ', ')}
         </p>
         <p>Saved to this project. Publish separately to update the public site.</p>
         <div className="entry-date-fields">
@@ -145,12 +145,12 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
         <p role="status">{error}</p>
         {confirming ? (
           <div className="delete-confirmation">
-            <p>Delete this passage and its note? The original photograph stays. This cannot be undone in the editor.</p>
-            <button type="button" className="confirm-delete" disabled={busy} onClick={deletePassage}>Delete passage</button>
-            <button type="button" className="keep-passage" ref={keepPassage} disabled={busy} onClick={() => setConfirming(false)}>Keep passage</button>
+            <p>Delete this {multiple ? 'passage' : 'entry'} and its note? The original scans stay. This cannot be undone in the editor.</p>
+            <button type="button" className="confirm-delete" disabled={busy} onClick={deletePassage}>Delete {multiple ? 'passage' : 'entry'}</button>
+            <button type="button" className="keep-passage" ref={keepPassage} disabled={busy} onClick={() => setConfirming(false)}>Keep {multiple ? 'passage' : 'entry'}</button>
           </div>
         ) : (
-          <button type="button" className="delete-passage" disabled={busy} onClick={() => setConfirming(true)}>Delete passage…</button>
+          <button type="button" className="delete-passage" disabled={busy} onClick={() => setConfirming(true)}>Delete {multiple ? 'passage' : 'entry'}…</button>
         )}
         <div>
           <button type="button" className="cancel" disabled={busy} onClick={() => dialog.current.close()}>Cancel</button>

@@ -1,6 +1,7 @@
 import { createRef } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { mountControl } from './mount.jsx';
+import { connectReadingScans } from './reading-scans.js';
 import { PhotoViewer } from './viewer.jsx';
 import { connectGallery, navigateTo, revealViewerPage } from '../web/gallery.js';
 
@@ -21,6 +22,7 @@ for (const select of document.querySelectorAll('.jump-control > select')) {
 }
 
 const links = [...document.querySelectorAll('.photograph')];
+const scans = connectReadingScans(links);
 const viewer = createRef();
 mountControl(document.getElementById('photo-viewer-root'),
   <PhotoViewer ref={viewer} links={links} onPageChange={revealViewerPage} />);
@@ -29,4 +31,4 @@ connectGallery({
   close: () => viewer.current.close(),
   isOpen: () => viewer.current.isOpen(),
   index: () => viewer.current.index(),
-}, links);
+}, links, scans);

@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {validDate,headingParts,resolveEntryDates,resolveBookDates,chartWeek,topTen,explicitCoordinates,weatherRecord} from '../scripts/context-data.js';
-import {buildJournalModel} from '../scripts/journal-model.js';
+import {absorbedSourcePassages,buildJournalModel} from '../scripts/journal-model.js';
 import {searchableHTML,entryBoundaries,splitTranscription} from '../scripts/entry-layout.js';
 import {renderContextBlock,renderEntryContext} from '../scripts/render-context.js';
 
@@ -72,8 +72,10 @@ test('reading aids keep detailed weather collapsed and year navigation points to
 test('every entry retains its source text and has its own attached weather rather than a page-end panel',()=>{
  const data=JSON.parse(readFileSync('content/entry-context.json'));
  const raw=readFileSync('web/index.html','utf8');const built=readFileSync('dist/index.html','utf8');
- const model=buildJournalModel(raw,data,JSON.parse(readFileSync('content/entry-groups.json')));
+ const grouping=JSON.parse(readFileSync('content/entry-groups.json'));
+ const model=buildJournalModel(raw,data,grouping);
  const corrections=JSON.parse(readFileSync('content/corrections.json'));
+ const absorbed=absorbedSourcePassages(model,grouping,corrections);
  let count=0;
  for(const [order,page]of Object.entries(data.pages)){
   const section=raw.match(new RegExp('<section class="log-page" id="page-'+order.padStart(3,'0')+'"[\\s\\S]*?</section>'))[0];
@@ -88,7 +90,7 @@ test('every entry retains its source text and has its own attached weather rathe
    const article=built.match(new RegExp('<article class="log-entry dated-context"[^>]*id="context-'+model.membership.get(entry.id)+'"[^>]*>[\\s\\S]*?</article>'))?.[0];
    const group=model.groups.get(model.membership.get(entry.id));
    if(group.passageIds.every(id=>corrections[id]?.deleted)){assert(!article);count++;continue;}
-   assert(article,'Entry wrapper: '+entry.id);assert.equal(built.includes(`data-passage-id="${entry.id}"`),!corrections[entry.id]?.deleted);assert(article.includes('class="entry-text"'));
+   assert(article,'Entry wrapper: '+entry.id);assert.equal(built.includes(`data-passage-id="${entry.id}"`),!corrections[entry.id]?.deleted&&!absorbed.has(entry.id));assert(article.includes('class="entry-text"'));
    const resolved=correctedEntryDate(model.groups.get(model.membership.get(entry.id)),corrections,data);
    const finalArticle=[...built.matchAll(/<article class="log-entry dated-context"[^>]*>[\s\S]*?<\/article>/g)].findLast(([section])=>section.includes(`data-entry-id="${group.id}"`))?.[0];
    if(resolved.date){const article=finalArticle;assert(article.indexOf('class="entry-text"')<article.indexOf('class="entry-context"'));if((resolved.weather_keys||[resolved.weather_key]).some(key=>data.weather[key]))assert(article.includes(resolved.weather_reference.name));else assert(article.includes('Historical weather is unavailable'));assert(!article.includes('class="entry-home-port"'));assert(!article.includes('class="context-note date-basis"'));assert(article.includes('Weather and music for'));}

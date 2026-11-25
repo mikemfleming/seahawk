@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 export function splitContinuationCorrection(corrections,{from,to,before}){
  const original=corrections[from];
- if(!original)return corrections;
+ if(!original||original.complete_entry)return corrections;
  const index=original.text.indexOf(before);
  if(index<0)return corrections;
  if(corrections[to])throw Error('Destination already has an independent correction: '+to);

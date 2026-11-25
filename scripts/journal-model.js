@@ -45,3 +45,14 @@ export function buildJournalModel(html,data,config={groups:[]}){
  }
  return {pages,passages,groups,membership};
 }
+
+// Source fragments stay addressable for scan provenance and older snapshots.
+export function absorbedSourcePassages(model, config, corrections) {
+ const absorbed=new Map((config.absorbed_passages||[])
+  .filter(item=>corrections[item.into]).map(item=>[item.id,item.into]));
+ for(const group of model.groups.values()){
+  if(!corrections[group.id]?.complete_entry)continue;
+  for(const id of group.passageIds.slice(1))absorbed.set(id,group.id);
+ }
+ return absorbed;
+}

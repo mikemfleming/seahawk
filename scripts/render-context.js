@@ -2,7 +2,7 @@ import {correctedEntryDate,latestDateCorrection} from './entry-dates.js';
 import {renderPageArtifacts} from './artifacts.js';
 import {formatEntryUpdated} from '../web/entry-updated.js';
 import {weeklyContextHTML} from './render-weekly-context.js';
-import {buildJournalModel} from './journal-model.js';
+import {absorbedSourcePassages,buildJournalModel} from './journal-model.js';
 import {readFileSync} from 'node:fs';
 const entryGroups=JSON.parse(readFileSync(new URL('../content/entry-groups.json',import.meta.url)));
 const escape=value=>String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -35,13 +35,14 @@ export function renderContextBlock(page,data){
 export function renderEntryContext(html,data,corrections={},grouping=entryGroups,artifacts={items:[]}){
  if(!data)return html;
  const model=buildJournalModel(html,data,grouping);
- const absorbed=new Set((grouping.absorbed_passages||[]).filter(item=>corrections[item.into]).map(item=>item.id));
+ const absorbed=absorbedSourcePassages(model,grouping,corrections);
  const visiblePassages=new Map([...model.groups].map(([id,group])=>[
   id,group.passageIds.filter(passage=>!corrections[passage]?.deleted&&!absorbed.has(passage))
  ]));
  function renderGroup(group,page,ids){
   const visible=visiblePassages.get(group.id);
   const firstPage=model.passages.get(visible[0]).page;
+  const readingPages=[...new Set(group.passageIds.filter(id=>visible.includes(id)||visible.includes(absorbed.get(id))).map(id=>model.passages.get(id).page))];
   const corrected=visible.every(id=>corrections[id]?.text?.trim());
   const badge=`<span class="entry-corrected"${corrected?'':' hidden'}>Corrected</span>`;
   const lastPage=model.passages.get(visible.at(-1)).page;
@@ -52,14 +53,16 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
    const passage=model.passages.get(id),correction=corrections[id];
    const text=correction?correction.text.split(/\n\s*\n/).map(paragraph=>`<p class="passage">${escape(paragraph)}</p>`).join('\n'):passage.html;
    const note=correction?.note?.trim()?`<p class="entry-clarification"><strong>Note:</strong> ${escape(correction.note)}</p>`:'';
+   const sources=visible.length===1?readingPages:[passage.page];
+   const originals=sources.map(number=>`<button type="button" class="source-photo" data-source-page="${number}" aria-label="View original page ${number}">${sources.length===1?'View original ↗':`Page ${number} ↗`}</button>`).join('');
    return `<div class="entry-passage" data-passage-id="${escape(id)}" data-entry-id="${escape(group.id)}" data-source-page="${passage.page}"${id!==group.id?` id="context-${escape(id)}"`:''}>
     ${id!==visible[0]?`<p class="continuation-divider">Continued on page ${passage.page}</p>`:''}
-    <div class="passage-source"><span>From page ${passage.page}</span><button type="button" class="source-photo" data-source-page="${passage.page}" aria-label="View original page ${passage.page}">View original ↗</button></div>
+    <div class="passage-source"><span>${sources.length===1?`From page ${passage.page}`:"Original pages"}</span>${originals}</div>
     <div class="entry-text">${text}</div>${note}</div>`;
   }).join('\n');
   const latest=group.passageIds.map(id=>corrections[id]?.updated_at).filter(value=>formatEntryUpdated(value)).sort((a,b)=>Date.parse(b)-Date.parse(a))[0];
   const updated=`<p class="entry-updated">${latest?`Last updated <time datetime="${escape(latest)}">${escape(formatEntryUpdated(latest))}</time>`:'Not yet updated'}</p>`;
-  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-entry-date="${escape(entry.date||'')}" data-entry-end-date="${escape(entry.end_date||'')}" data-date-revision="${escape(latestDateCorrection(group,corrections)?.date_updated_at||'')}" data-source-pages="${group.pages.join(',')}" data-passage-count="${visible.length}"${page===firstPage?` id="context-${escape(group.id)}"`:''}>${page===firstPage?entryHeading(entry)+badge:`<p class="continuation-reference"><a href="#context-${escape(group.id)}">${escape(title)} ↗</a></p>`}${parts}${page===lastPage?entryContext(entry,data)+updated:''}</article>`;
+  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-entry-date="${escape(entry.date||'')}" data-entry-end-date="${escape(entry.end_date||'')}" data-date-revision="${escape(latestDateCorrection(group,corrections)?.date_updated_at||'')}" data-source-pages="${group.pages.join(',')}" data-passage-count="${visible.length}" data-reading-pages="${readingPages.join(',')}"${page===firstPage?` id="context-${escape(group.id)}"`:''}>${page===firstPage?entryHeading(entry)+badge:`<p class="continuation-reference"><a href="#context-${escape(group.id)}">${escape(title)} ↗</a></p>`}${parts}${page===lastPage?entryContext(entry,data)+updated:''}</article>`;
  }
  html=html.replace(/<section class="log-page" id="page-(\d+)"[\s\S]*?<\/section>/g,(section,n)=>{
   const page=model.pages.get(Number(n));
@@ -68,7 +71,7 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
   const contents=page.pieces.map(piece=>{
    if(!piece.id)return piece.html;
    if(corrections[piece.id]?.deleted)return '';
-   if(absorbed.has(piece.id))return `<span id="context-${escape(piece.id)}" hidden></span>`;
+   if(absorbed.has(piece.id))return `<span id="context-${escape(piece.id)}" hidden data-absorbed-passage></span>`;
    const group=model.groups.get(model.membership.get(piece.id));
    if(rendered.has(group.id))return '';
    rendered.add(group.id);

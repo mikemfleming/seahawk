@@ -1,5 +1,5 @@
 import {dateOverrideError,latestDateCorrection} from '../scripts/entry-dates.js';
-import {buildJournalModel} from '../scripts/journal-model.js';
+import {absorbedSourcePassages,buildJournalModel} from '../scripts/journal-model.js';
 import {validateArtifact,renderArtifact} from '../scripts/artifacts.js';
 import {readFileSync,writeFileSync,renameSync,existsSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
@@ -40,6 +40,7 @@ export function localEditor({correctionsFile=resolve('content/corrections.json')
     file=artifactsFile;saved=artifacts;response={artifact:record,html:renderArtifact(record,model.pages.get(record.page))};
    }else{
     if(!model.passages.has(input.id)){reply(400,{error:'Unknown passage.'});return true;}
+    if(absorbedSourcePassages(model,grouping,corrections).has(input.id)){reply(409,{error:'This text belongs to a complete entry. Copy any unsaved text before reloading.'});return true;}
     if(corrections[input.id]?.deleted){reply(409,{error:'This passage has already been deleted. Copy any unsaved text before reloading.'});return true;}
     if(input.action!=='delete'&&(typeof input.text!=='string'||!input.text.trim()||input.text.length>50000||typeof input.note!=='string'||input.note.length>10000)){reply(400,{error:'A known entry and nonempty text are required'});return true;}
     if((corrections[input.id]?.updated_at||null)!==(input.revision||null)){reply(409,{error:'This entry changed in another tab. Reload before editing.'});return true;}

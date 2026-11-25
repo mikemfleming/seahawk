@@ -69,3 +69,39 @@ test('an absorbed continuation is hidden only when its corrected replacement exi
  assert.doesNotMatch(html,/data-passage-id="P-page-041-prefix"/);
  assert.match(renderEntryContext(raw,data,{}),/Really takes a sporting paradox/);
 });
+
+
+test('July 29 has one saved transcription with both original scans',()=>{
+ const corrections=JSON.parse(readFileSync('content/corrections.json'));
+ const id='E-d779898898', continuation='E-be19a07009';
+ assert.equal(corrections[continuation],undefined);
+ assert.match(corrections[id].text,/could not tie on\.\n\nWe proceeded off shore/);
+ assert.match(corrections[id].note,/Val England[\s\S]*Vermillion/);
+ const html=renderEntryContext(raw,data,corrections,config);
+ const article=html.match(new RegExp('<article[^>]*id="context-'+id+'"[^>]*>[\\s\\S]*?</article>'))[0];
+ assert.match(article,/data-passage-count="1" data-reading-pages="14,15"/);
+ assert.match(article,/Guests were Dr Scott Holt[\s\S]*We proceeded off shore/);
+ assert.doesNotMatch(html,/data-passage-id="E-be19a07009"/);
+ assert.match(html,/id="context-E-be19a07009" hidden/);
+});
+
+test('each multi-page trip has one editable transcription in the current archive',()=>{
+ const corrections=JSON.parse(readFileSync('content/corrections.json'));
+ const html=renderEntryContext(raw,data,corrections,config);
+ for(const group of model.groups.values()){
+  if(group.pages.length<2)continue;
+  const articles=[...html.matchAll(/<article\b[\s\S]*?<\/article>/g)]
+   .map(([article])=>article)
+   .filter(article=>article.includes(`data-entry-id="${group.id}"`));
+  assert.equal(articles.length,1,group.id);
+  assert.match(articles[0],/data-passage-count="1"/);
+  const activeIds=group.passageIds.filter(id=>corrections[id]?.text);
+  assert.deepEqual(activeIds,[group.id]);
+  if(group.passageIds.some(id=>corrections[id]?.deleted))continue;
+  assert(articles[0].includes(`data-reading-pages="${group.pages.join(',')}"`));
+  for(const page of group.pages){
+   assert(articles[0].includes(`aria-label="View original page ${page}"`));
+  }
+ }
+ assert.match(corrections['E-a0b22e406e'].text,/Good summer so far\.\n\nWell, there’s more to that\./);
+});

@@ -130,6 +130,11 @@
   ],
   "absorbed_passages": [
     {
+      "id": "E-be19a07009",
+      "into": "E-d779898898",
+      "reason": "The corrected July 29 entry includes the full continuation from page 15."
+    },
+    {
       "id": "P-page-041-prefix",
       "into": "E-a355f8a7f0",
       "reason": "The owner included the page 41 continuation about the broken T-top brace and Double O tuna party in the corrected page 40 passage."
