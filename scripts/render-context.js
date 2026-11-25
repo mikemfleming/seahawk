@@ -27,7 +27,7 @@ function entryHeading(entry){
 }
 function entryContext(entry,data){
  if(!entry.date)return '';
- return `<aside class="entry-context" aria-label="Weather and music for ${day(entry.date)}">${(entry.weather_keys||[entry.weather_key]).map(key=>weatherHTML({...entry,weather_key:key},data)).join('')}${(entry.chart_dates?.length?entry.chart_dates:[entry.chart_date]).map(date=>chartHTML({...entry,chart_date:date},data)).join('')}${weeklyContextHTML(entry,data.weekly)}${entry.basis==='Date corrected by the family'&&!data.weekly?.snapshots?.[entry.date]?'<p class="context-note">Historical events and economy data have not been prepared for this corrected date.</p>':''}</aside>`;
+ return `<aside class="entry-context" aria-label="Weather and music for ${day(entry.date)}">${(entry.weather_keys?.length?entry.weather_keys:[entry.weather_key]).map(key=>weatherHTML({...entry,weather_key:key},data)).join('')}${(entry.chart_dates?.length?entry.chart_dates:[entry.chart_date]).map(date=>chartHTML({...entry,chart_date:date},data)).join('')}${weeklyContextHTML(entry,data.weekly)}${entry.basis==='Date corrected by the family'&&!data.weekly?.snapshots?.[entry.date]?'<p class="context-note">Historical events and economy data have not been prepared for this corrected date.</p>':''}</aside>`;
 }
 export function renderContextBlock(page,data){
  return page.entries.map(entry=>entryHeading(entry)+entryContext(entry,data)).join('');

@@ -5739,6 +5739,90 @@
     "70": {
       "entries": [
         {
+          "id": "E-page-070-aug-13",
+          "label": "8/13/",
+          "date": "2001-08-13",
+          "dates": [
+            "2001-08-13"
+          ],
+          "end_date": null,
+          "basis": "Year inferred from chronological entries",
+          "resolved_heading": "8/13/",
+          "region": "Hawaii",
+          "weather_reference": {
+            "id": "kona",
+            "name": "Kona, Hawaii",
+            "latitude": 19.64016,
+            "longitude": -155.99907,
+            "kind": "home-port",
+            "precision": "Home port supplied by the owner",
+            "region": "Hawaii"
+          },
+          "weather_key": null,
+          "weather_keys": [],
+          "chart_date": null,
+          "chart_dates": [],
+          "weather_status": "unavailable",
+          "chart_status": "unavailable",
+          "layout_anchor": "mikeemlthenodtosnorkelsouthtocbuoy"
+        },
+        {
+          "id": "E-page-070-aug-14",
+          "label": "8/14/",
+          "date": "2001-08-14",
+          "dates": [
+            "2001-08-14"
+          ],
+          "end_date": null,
+          "basis": "Year inferred from chronological entries",
+          "resolved_heading": "8/14/",
+          "region": "Hawaii",
+          "weather_reference": {
+            "id": "kona",
+            "name": "Kona, Hawaii",
+            "latitude": 19.64016,
+            "longitude": -155.99907,
+            "kind": "home-port",
+            "precision": "Home port supplied by the owner",
+            "region": "Hawaii"
+          },
+          "weather_key": null,
+          "weather_keys": [],
+          "chart_date": null,
+          "chart_dates": [],
+          "weather_status": "unavailable",
+          "chart_status": "unavailable",
+          "layout_anchor": "jimriggottrickgaffneymeonthekonaspirit"
+        },
+        {
+          "id": "E-page-070-aug-15",
+          "label": "8/15/",
+          "date": "2001-08-15",
+          "dates": [
+            "2001-08-15"
+          ],
+          "end_date": null,
+          "basis": "Year inferred from chronological entries",
+          "resolved_heading": "8/15/",
+          "region": "Hawaii",
+          "weather_reference": {
+            "id": "kona",
+            "name": "Kona, Hawaii",
+            "latitude": 19.64016,
+            "longitude": -155.99907,
+            "kind": "home-port",
+            "precision": "Home port supplied by the owner",
+            "region": "Hawaii"
+          },
+          "weather_key": null,
+          "weather_keys": [],
+          "chart_date": null,
+          "chart_dates": [],
+          "weather_status": "unavailable",
+          "chart_status": "unavailable",
+          "layout_anchor": "mikedougmejimvirgilonthedecisionwithscott"
+        },
+        {
           "id": "E-99c1ba1e3b",
           "label": "July 1st 2002",
           "date": "2002-07-01",
@@ -6064,6 +6148,30 @@
           "layout_anchor": "denisekaneontwo30boatputinwateronthe1stofjulyfirstdaydogseymouran"
         },
         {
+          "id": "E-page-073-july-02",
+          "label": "Undated passage",
+          "date": null,
+          "dates": [],
+          "basis": "No calendar day recorded",
+          "region": "Hawaii",
+          "weather_reference": {
+            "id": "kona",
+            "name": "Kona, Hawaii",
+            "latitude": 19.64016,
+            "longitude": -155.99907,
+            "kind": "home-port",
+            "precision": "Home port supplied by the owner",
+            "region": "Hawaii"
+          },
+          "weather_key": null,
+          "weather_keys": [],
+          "chart_date": null,
+          "chart_dates": [],
+          "weather_status": "date_unknown",
+          "chart_status": "date_unknown",
+          "layout_anchor": "nextdaydougatthegroomontimeonethecatcher2nice"
+        },
+        {
           "id": "E-5dd16f09b0",
           "label": "Undated passage",
           "date": null,
@@ -6085,67 +6193,7 @@
           "chart_dates": [],
           "weather_status": "date_unknown",
           "chart_status": "date_unknown",
-          "layout_anchor": "nextdaywetalklyttingharringtonandyoungmusseuiwhoismarryingclayton"
-        }
-      ]
-    },
-    "77": {
-      "entries": [
-        {
-          "id": "E-5762d5533a",
-          "label": "April 29th, 2000",
-          "date": "2000-04-29",
-          "dates": [
-            "2000-04-29"
-          ],
-          "end_date": null,
-          "basis": "Date as transcribed",
-          "resolved_heading": "April 29th, 2000",
-          "region": "Hawaii",
-          "weather_reference": {
-            "id": "kona",
-            "name": "Kona, Hawaii",
-            "latitude": 19.64016,
-            "longitude": -155.99907,
-            "kind": "home-port",
-            "precision": "Home port supplied by the owner",
-            "region": "Hawaii"
-          },
-          "weather_key": "kona/2000-04-29",
-          "weather_keys": [
-            "kona/2000-04-29"
-          ],
-          "chart_date": "2000-04-29",
-          "chart_dates": [
-            "2000-04-29"
-          ],
-          "weather_status": "available",
-          "chart_status": "available",
-          "layout_anchor": "firstbluemarlinontheseahawk287poundsnotamonsterbutgoodforopenersm"
-        },
-        {
-          "id": "E-d7072e9cbd",
-          "label": "Undated passage",
-          "date": null,
-          "dates": [],
-          "basis": "No calendar day recorded",
-          "region": "Hawaii",
-          "weather_reference": {
-            "id": "kona",
-            "name": "Kona, Hawaii",
-            "latitude": 19.64016,
-            "longitude": -155.99907,
-            "kind": "home-port",
-            "precision": "Home port supplied by the owner",
-            "region": "Hawaii"
-          },
-          "weather_key": null,
-          "weather_keys": [],
-          "chart_date": null,
-          "chart_dates": [],
-          "weather_status": "date_unknown",
-          "chart_status": "date_unknown",
-          "layout_anchor": "lookingbackfromanelevenyearperspectiveitwasagreattriprunningthewa"
+          "layout_anchor": "104thisoffyongenextdaywetalklyttingharrington"
         }
       ]
     }

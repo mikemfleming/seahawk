@@ -1,6 +1,6 @@
 # The Seahawk log
 
-A single static page: 73 displayed Ricoh photographs in original page order (pages 5–10 omitted), with the transcription directly beneath each one. Select a photograph to open a larger copy. Brackets preserve uncertain readings.
+A single static page: 69 displayed Ricoh photographs in original page order (pages 5–10 omitted, the clipping formerly numbered 76 in Loose clippings, the clipping formerly numbered 78 attached to July 10, 1998, and the typed inserts formerly numbered 77 and 79 attached to April 25, 2000), with the transcription directly beneath each one. Select a photograph to open a larger copy. Brackets preserve uncertain readings.
 
 The public website has no login, database connection, or editing interface. A separate local server supports corrections. React adds page jumping and an accessible photo viewer with zoom, previous/next pages and arrow-key navigation; the photographs and text remain readable without it. All photographs and text are part of the page's static files. All 79 original full-resolution exports remain untouched.
 

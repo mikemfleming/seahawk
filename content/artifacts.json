@@ -349,9 +349,10 @@
     {
       "id": "A-page-076-lucky-boys-clipping",
       "page": 76,
+      "sourceDimensions": [1800, 1200],
       "type": "clipping",
       "title": "“Lucky boys” newspaper clipping",
-      "caption": "A saved Woody’s Catch of the Week clipping shows Michael Fleming and Alex DuCote with their catch at Woody’s Sports Center. The printed caption describes the two five-and-a-half-year-old anglers fishing with guide Smokey Gaines. The surrounding printed text remains transcribed on this page.",
+      "caption": "A saved Woody’s Catch of the Week clipping shows Michael Fleming and Alex DuCote with their catch at Woody’s Sports Center. The printed caption describes the two five-and-a-half-year-old anglers fishing with guide Smokey Gaines.",
       "crop": {
         "x": 0.2388888888888889,
         "y": 0.1,
@@ -362,11 +363,25 @@
       "updated_at": "2026-11-23T21:07:27.391Z"
     },
     {
+      "id": "A-page-077-typed-log",
+      "page": 77,
+      "entryId": "E-a73bd50f4b",
+      "sourceDimensions": [1800, 1200],
+      "type": "other",
+      "title": "First blue marlin on the Seahawk · Typed insert",
+      "caption": "Seahawk log\nApril 29th, 2000\nFirst Blue Marlin on the Seahawk....287 pounds...not a monster, but good for openers .My poor gaff job probably caused him not to exceed 300 pounds.\nWe started out trolling from the harbor to VV buoy , then headed inshore to Red Hill , where we switched to Wahoo gear, and worked the 50-100 fathom curve all the way down to the Limp Dick Man lava flow, about 16 miles with no hits . We then trolled out to UU buoy , about three miles, and upon no signs for Aku. Captain Brian called to say that he was marking bait nearby ...in short order we found the school . Mike caught one Aku and two small Ahis...we rigged up three found Aku and ten pound Ahi for trollers and headed offshore from UU .Mike caught another Ahi for food. Mike called his rigged bait Ahi ,Rover .\nMike was sitting forward on the console cooler working on his vocabulary lesson and asked me a question . I turned over the wheel to John and was sitting next to Mike . John noticed #64 rubber band holding the Port tag line was stretched out to two feet ! he hauled down the lanyard , popped the band, fed the bait back , then free spooled the 130 ...I got back on the wheel and John looked at me ,he said GO . He did and I did , and we hooked up ! About a thirty minute fight and he came in green . John handled the leader and I had a good Fly gaff shot about him low and a bit aft of his right pectoral. With that all hell breaks loose and with the one inch gaff line tight as a fiddle string ...quite a sight ! Lots of water being thrown . I load up the 410 snack charmer and settle his hash as I board side. Until then he was towing the Seahawk around at a speed of two knots or so .\nThen we had the job of getting him into the boat. It took four attempts before we finally got him in . Three attempts we got the marlin with the best gaff runners for instruction. The only way we made the Marlin in the boat was getting Mike in the act . His 150 pounds made the difference . We pulled up the fighting chair to make room for our guest in the cockpit .\nWe then trolled back to Kona without another strike , but wow , what a day. Tim and Linda were married today , probably about the time we boated the Blue .\nMike's note ... My opinion is that was some ass whooping fish ! I was up in the Bow when it happened with Rover . The Marlin was so close to the Tuna I was holding , I almost fainted .\nLooking back from an eleven year perspective , it was a great trip . Running the Wahoo route down to Milolie from Kona was always a joy as we were so close to the surf while trolling at ten knots for Wahoo. Looking to shore the blowholes around the Red Hill area were great to see , as well as the resident school of whales that we usually hunted in this area.\nThe John referred to in this entry is my good friend John Bagwell , the captain of the Silkey . John was and still is , one of the best Marlin skippers in the harbor, and usually led the fleet in numbers of tagged and released Blue. Hes fished with me often on his days off , and was kind to share is knowledge of billfishing with a novice.\nThe school of bait that Captain Grilling alluded to our attention was a big one . When it surfaced it was as big as two football fields . A Hailu had driven silver minnows to the surface , and the white frothing surface was alive with Aku and some small Ahi that had joined the fray. Within seconds the Sooty terns appear by the hundreds accompanied by",
+      "crop": null,
+      "created_at": "2026-11-25T15:26:08.450Z",
+      "updated_at": "2026-11-25T15:26:08.450Z"
+    },
+    {
       "id": "A-page-078-saltwater-angler-clipping",
       "page": 78,
+      "entryId": "E-c550df3542",
+      "sourceDimensions": [1800, 1200],
       "type": "clipping",
       "title": "Port Aransas Offshore newspaper page",
-      "caption": "A saved Saltwater Angler page combines fishing photographs, Deep Sea Roundup captions and local charter advertisements. One caption names Bill Hudspeth aboard Sea Hawk II with Capt. Ed Fleming. The printed text remains transcribed on this page.",
+      "caption": "A saved Saltwater Angler page combines fishing photographs, Deep Sea Roundup captions and local charter advertisements. One caption names Bill Hudspeth aboard Sea Hawk II with Capt. Ed Fleming.",
       "crop": {
         "x": 0.2222222222222222,
         "y": 0.03333333333333333,
@@ -375,6 +390,18 @@
       },
       "created_at": "2026-11-23T21:07:27.391Z",
       "updated_at": "2026-11-23T21:07:27.391Z"
+    },
+    {
+      "id": "A-page-079-typed-log-continuation",
+      "page": 79,
+      "entryId": "E-a73bd50f4b",
+      "sourceDimensions": [1800, 1200],
+      "type": "other",
+      "title": "First blue marlin on the Seahawk · Typed insert, continued",
+      "caption": "Page 2\n\nFrigate birds and the beautiful white Marlin Bird. Strangely, these birds make no cry, so the slaughter is not accompanied by the frenzied shrieks usual when gulls corner bait in the Gulf of Mexico. <<This sounds like the start of EJM and the Solution of the Problem>>\nAlso, I mentioned the Marlin came in green ... we later determined that he swallowed the live ten pound bait without knocking the line out of the rigger, so he got the bait and its #11 sharp as hell hook way down in it's vitals. That's why the fight was short and took place so close to the boat. To make it worse, my Fly gaff job was not my best, and it caused the Blue to really go ballistic at the boat.\nA fine run back to Kona with the good smell of the big Marlin on the deck and watching Mike back at his lessons on the console cooler.",
+      "crop": null,
+      "created_at": "2026-11-25T15:29:30.477Z",
+      "updated_at": "2026-11-25T15:29:30.477Z"
     }
   ]
 }

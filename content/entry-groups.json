@@ -2,6 +2,17 @@
   "version": 1,
   "groups": [
     {
+      "id": "P-page-074-body",
+      "passages": [
+        {
+          "id": "P-page-074-body",
+          "page": 74,
+          "source": "body"
+        }
+      ],
+      "evidence": "Standalone undated text on page 74."
+    },
+    {
       "id": "E-d779898898",
       "passages": [
         "E-d779898898",
@@ -108,18 +119,6 @@
         "E-bb324d94b6"
       ],
       "evidence": "Last trip of the year continues across pages 71\u201372."
-    },
-    {
-      "id": "E-d7072e9cbd",
-      "passages": [
-        "E-d7072e9cbd",
-        {
-          "id": "P-page-079-body",
-          "page": 79,
-          "source": "body"
-        }
-      ],
-      "evidence": "Retrospective typed insert on page 77 ends with birds accompanied by; page 79 continues with frigate birds. Page 78 is an intervening clipping."
     }
   ],
   "correction_splits": [

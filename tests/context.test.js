@@ -95,5 +95,5 @@ test('every entry retains its source text and has its own attached weather rathe
    count++;
   }
  }
- assert.equal(count,187);assert.doesNotMatch(built,/class="page-context"/);
+ assert.equal(count,189);assert.doesNotMatch(built,/class="page-context"/);
 });

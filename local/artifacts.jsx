@@ -16,7 +16,7 @@ function ArtifactEditor({ page, record, onClose, onSave }) {
   const [crop, setCrop] = useState(record?.crop ?? null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const number = Number(page.id.slice(5));
+  const number = record?.page ?? Number(page.id.slice(5));
   useLayoutEffect(() => { dialog.current.showModal(); }, []);
 
   function beginCrop(event) {
@@ -76,11 +76,11 @@ function ArtifactEditor({ page, record, onClose, onSave }) {
       onClose={onClose} onCancel={event => { if (busy) event.preventDefault(); }}>
       <form onSubmit={submit}>
         <h2 id="artifact-editor-title">{record ? 'Edit artifact' : 'Add artifact'}</h2>
-        <p className="artifact-page-label">Page {number}</p>
+        <p className="artifact-page-label">{record?.entryId ? 'Artifact attached to entry' : record?.sourceDimensions ? 'Loose clipping' : `Page ${number}`}</p>
         <p>Drag across the photograph to select an illustration or detail. Leave it unselected to use the whole page.</p>
         <div className="crop-stage" onPointerDown={beginCrop} onPointerMove={moveCrop}
           onPointerUp={finishCrop} onPointerCancel={finishCrop}>
-          <img alt="Original journal page" draggable={false} src={page.querySelector('.photograph img').src} />
+          <img alt="Original journal page" draggable={false} src={record?.sourceDimensions ? `photos/${String(number).padStart(3, '0')}-large.jpg` : page.querySelector('.photograph img').src} />
           <div className="crop-selection" hidden={!crop} style={selectionStyle || undefined} />
         </div>
         <button type="button" className="reset-crop" onClick={() => setCrop(null)}>Use whole page</button>
@@ -137,9 +137,9 @@ function PageArtifactControls({ page, container, records, slot }) {
 
   return (
     <>
-      <button type="button" className="add-artifact" ref={addButton} onClick={event => open(event.currentTarget, null)}>
+      {page && !container.matches('.entry-artifacts') && <button type="button" className="add-artifact" ref={addButton} onClick={event => open(event.currentTarget, null)}>
         Add artifact to page {Number(page.id.slice(5))}
-      </button>
+      </button>}
       {figures.map(figure => createPortal(
         <button type="button" className="edit-artifact" onClick={event => open(event.currentTarget, figure)}>Edit artifact</button>,
         figure.querySelector('figcaption'), figure.dataset.artifactId,
@@ -156,14 +156,22 @@ export async function prepareArtifactControls() {
   if (!response.ok) throw Error('Could not load saved artifacts.');
   const store = await response.json();
   const records = new Map(store.items.map(record => [record.id, record]));
-  return [...document.querySelectorAll('.log-page')].map(page => {
-    let container = page.querySelector('.page-artifacts');
+  const controls = [...document.querySelectorAll('.log-page')].flatMap(page => {
+    let container = page.querySelector(':scope > .page-artifacts');
     if (!container) {
       container = document.createElement('div');
       container.className = 'page-artifacts';
       page.append(container);
     }
-    const slot = appendSlot(container);
-    return createPortal(<PageArtifactControls page={page} container={container} records={records} slot={slot} />, slot, page.id);
+    return [container, ...page.querySelectorAll('.entry-artifacts')].map((target, index) => {
+      const slot = appendSlot(target);
+      return createPortal(<PageArtifactControls page={page} container={target} records={records} slot={slot} />, slot, page.id + '-' + index);
+    });
   });
+  const loose = document.querySelector('.loose-clippings > .page-artifacts');
+  if (loose) {
+    const slot = appendSlot(loose);
+    controls.push(createPortal(<PageArtifactControls page={null} container={loose} records={records} slot={slot} />, slot, 'loose-clippings'));
+  }
+  return controls;
 }

@@ -117,7 +117,7 @@ export function connectGallery(viewer, links) {
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveReadingPosition();});
 
   document.addEventListener('click', event => {
-    const button = event.target.closest('.source-photo');
+    const button = event.target.closest('button.source-photo');
     if (!button) return;
     const pageId = 'page-' + button.dataset.sourcePage.padStart(3, '0');
     const index = links.findIndex(link => link.closest('.log-page').id === pageId);

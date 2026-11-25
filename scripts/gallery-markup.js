@@ -1,4 +1,5 @@
 export function formatEscapedTranscription(text) {
+  if (!text.trim()) return text;
   if (text.includes('<article class="log-entry') || text.includes('class="continuation-reference"')) return text;
   if (text.startsWith('<p class="passage">') || text.startsWith('<p class="blank-page">')) return text;
   return text.trim().split(/\n[\t ]*\n+/).map(paragraph => `<p class="passage">${paragraph.replace(/\[(?:[^\]\n]*\?|illegible)\]/gi, '<mark class="uncertain">$&</mark>')}</p>`).join('\n');

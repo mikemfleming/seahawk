@@ -33,7 +33,7 @@ function updatePassage(article, result) {
     note.append(label, ' ' + result.note);
     text.after(note);
   }
-  const updated = [...document.querySelectorAll('.log-entry .entry-updated')].find(node =>
+  const updated = [...document.querySelectorAll('.log-entry > .entry-updated')].find(node =>
     node.closest('.log-entry').dataset.entryId === article.dataset.entryId);
   const time = document.createElement('time');
   time.dateTime = result.updated_at;
@@ -185,7 +185,7 @@ function LatestEntryJump() {
   function jump() {
     let latest = null;
     let latestDate = -Infinity;
-    for (const time of document.querySelectorAll('.log-entry .entry-updated time[datetime]')) {
+    for (const time of document.querySelectorAll('.log-entry > .entry-updated time[datetime]')) {
       const date = Date.parse(time.dateTime);
       if (date > latestDate) {
         latest = document.getElementById('context-' + time.closest('.log-entry').dataset.entryId);

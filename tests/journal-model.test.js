@@ -7,9 +7,9 @@ import {renderEntryContext} from '../scripts/render-context.js';
 const raw=readFileSync('web/index.html','utf8'),data=JSON.parse(readFileSync('content/entry-context.json')),config=JSON.parse(readFileSync('content/entry-groups.json'));
 const model=buildJournalModel(raw,data,config);
 test('grouping retains every source word, original passage ID and original photo page',()=>{
- assert.equal(model.pages.size,73);
+ assert.equal(model.pages.size,69);
  for(const page of model.pages.values())assert.equal(searchableHTML(page.pieces.map(piece=>piece.html).join('')).text,searchableHTML(page.body).text,'Source page '+page.order);
- const original=Object.values(data.pages).flatMap(page=>page.entries.map(entry=>entry.id));assert.equal(original.length,187);
+ const original=Object.values(data.pages).flatMap(page=>page.entries.map(entry=>entry.id));assert.equal(original.length,189);
  for(const id of original)assert(model.passages.has(id));
  const assigned=[...model.groups.values()].flatMap(group=>group.passageIds);assert.equal(new Set(assigned).size,model.passages.size);assert.equal(assigned.length,model.passages.size);
  assert.equal(model.membership.get('P-page-029-prefix'),'E-a0b22e406e');
