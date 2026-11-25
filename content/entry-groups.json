@@ -2,6 +2,50 @@
   "version": 1,
   "groups": [
     {
+      "id": "P-page-001-body",
+      "reference": true,
+      "passages": [
+        {
+          "id": "P-page-001-body",
+          "page": 1,
+          "source": "body"
+        }
+      ]
+    },
+    {
+      "id": "P-page-002-body",
+      "reference": true,
+      "passages": [
+        {
+          "id": "P-page-002-body",
+          "page": 2,
+          "source": "body"
+        }
+      ]
+    },
+    {
+      "id": "P-page-003-body",
+      "reference": true,
+      "passages": [
+        {
+          "id": "P-page-003-body",
+          "page": 3,
+          "source": "body"
+        }
+      ]
+    },
+    {
+      "id": "P-page-004-body",
+      "reference": true,
+      "passages": [
+        {
+          "id": "P-page-004-body",
+          "page": 4,
+          "source": "body"
+        }
+      ]
+    },
+    {
       "id": "P-page-074-body",
       "passages": [
         {

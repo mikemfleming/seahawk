@@ -102,4 +102,4 @@ Deletion replaces the saved correction with a minimal deletion marker so the ini
 
 ## Boat reference pages
 
-The main journal begins on page 11. A collapsed **About the Seahawk** section near the beginning holds **The boat** (page 3) and **Original records** (page 4), including their source photographs and transcriptions. Its nested **Original cover and title page** disclosure holds pages 1–2. Page links and navigation automatically reveal the appropriate section; the enlarged photo viewer retains the original page order.
+Pages 1–4 appear in the main reading flow and include the cover, title page, boat specifications and original records. The journal entries begin on page 11.

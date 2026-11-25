@@ -38,7 +38,7 @@ export function buildJournalModel(html,data,config={groups:[]}){
   for(const id of ids){if(!passages.has(id))throw Error('Unknown passage: '+id);if(membership.has(id))throw Error('Passage assigned twice: '+id);membership.set(id,definition.id);}
   const sourcePages=ids.map(id=>passages.get(id).page);
   if(sourcePages.some((page,index)=>index&&page<sourcePages[index-1]))throw Error('Passages must follow source page order');
-  groups.set(definition.id,{id:definition.id,passageIds:ids,entry:passages.get(ids[0]).entry,pages:[...new Set(sourcePages)]});
+  groups.set(definition.id,{id:definition.id,passageIds:ids,entry:passages.get(ids[0]).entry,reference:definition.reference===true,pages:[...new Set(sourcePages)]});
  }
  for(const passage of passages.values())if(!membership.has(passage.id)){
   membership.set(passage.id,passage.id);groups.set(passage.id,{id:passage.id,passageIds:[passage.id],entry:passage.entry,pages:[passage.page]});

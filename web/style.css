@@ -169,15 +169,6 @@ body>header { width:100%; padding:0; margin:0; }
 .artifact-caption { white-space: pre-wrap; }
 @media (max-width: 800px) { .page-artifacts { grid-column: 1 / -1; } }
 
-.book-reference { border: 1px solid #d7d7ca; padding: 20px 24px; margin-bottom: 48px; scroll-margin-top: 85px; }
-.book-reference>summary { cursor: pointer; font-size: 24px; line-height: 1.4; }
-.book-reference>summary span { display: block; margin: 4px 0 0 22px; font: 13px/1.6 system-ui,sans-serif; color: #6e746c; }
-.reference-intro { font: 14px/1.7 system-ui,sans-serif; color: #6e746c; margin-block: 20px 28px; }
-.front-matter { margin-bottom: 28px; }
-.front-matter>summary { cursor: pointer; font: 14px/1.6 system-ui,sans-serif; margin-bottom: 20px; }
-.book-reference .log-page { margin-bottom: 32px; }
-.book-reference .log-page:last-child { margin-bottom: 0; }
-@media(max-width:600px){.book-reference{padding:16px;}.book-reference>summary{font-size:21px;}}
 .entry-corrected { display: inline-block; margin-bottom: 10px; padding: 2px 8px; border-radius: 4px; background: #e3ebdf; color: #345242; font: 12px/1.5 system-ui, sans-serif; }
 .entry-corrected[hidden] { display: none; }
 .loose-clippings { max-width: 680px; margin: 0 auto 64px; scroll-margin-top: 100px; }

@@ -42,6 +42,7 @@ function updatePassage(article, result) {
 }
 
 function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
+  const reference = group.hasAttribute('data-reference');
   const dialog = useRef(null);
   const textarea = useRef(null);
   const highlightLayer = useRef(null);
@@ -73,7 +74,7 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
     const fields = new FormData(event.currentTarget);
     const date = fields.get('entryDate');
     const endDate = fields.get('endDate');
-    const changed = date !== group.dataset.entryDate || endDate !== group.dataset.entryEndDate;
+    const changed = !reference && (date !== group.dataset.entryDate || endDate !== group.dataset.entryEndDate);
     const dateFields = changed ? {
       date_override: { date: date || null, end_date: endDate || null },
       date_revision: group.dataset.dateRevision || null,
@@ -117,17 +118,19 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
     <dialog className="entry-editor" aria-labelledby="entry-editor-title" ref={dialog}
       onClose={onClose} onCancel={event => { if (busy) event.preventDefault(); }}>
       <form onSubmit={submit}>
-        <h2 id="entry-editor-title">{multiple ? 'Edit passage' : 'Edit journal entry'}</h2>
+        <h2 id="entry-editor-title">{reference ? 'Edit page transcription' : multiple ? 'Edit passage' : 'Edit journal entry'}</h2>
         <p className="edit-context">
           {multiple ? `Page ${article.dataset.sourcePage} · Part of ${group.dataset.entryTitle}` : group.dataset.entryTitle}
           {' · Source ' + (group.dataset.sourcePages.includes(',') ? 'pages ' : 'page ') + group.dataset.sourcePages.replaceAll(',', ', ')}
         </p>
         <p>Saved to this project. Publish separately to update the public site.</p>
-        <div className="entry-date-fields">
-          <label>Entry date<input type="date" name="entryDate" defaultValue={group.dataset.entryDate} /></label>
-          <label>End date (optional)<input type="date" name="endDate" defaultValue={group.dataset.entryEndDate} /></label>
-        </div>
-        <p>Correcting the date updates the heading and its historical context. Leave it blank if the date is unknown. Missing historical data will be marked unavailable.</p>
+        {!reference && <>
+          <div className="entry-date-fields">
+            <label>Entry date<input type="date" name="entryDate" defaultValue={group.dataset.entryDate} /></label>
+            <label>End date (optional)<input type="date" name="endDate" defaultValue={group.dataset.entryEndDate} /></label>
+          </div>
+          <p>Correcting the date updates the heading and its historical context. Leave it blank if the date is unknown. Missing historical data will be marked unavailable.</p>
+        </>}
         <label>Transcription
           <div className="transcription-input">
             <div className="transcription-highlights" aria-hidden="true" ref={highlightLayer}>
@@ -143,7 +146,7 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
         <p className="highlight-help">Yellow marks uncertain or incomplete readings.</p>
         <label>Note (optional)<textarea name="note" rows={3} defaultValue={record?.note ?? ''} /></label>
         <p role="status">{error}</p>
-        {confirming ? (
+        {!reference && (confirming ? (
           <div className="delete-confirmation">
             <p>Delete this {multiple ? 'passage' : 'entry'} and its note? The original scans stay. This cannot be undone in the editor.</p>
             <button type="button" className="confirm-delete" disabled={busy} onClick={deletePassage}>Delete {multiple ? 'passage' : 'entry'}</button>
@@ -151,7 +154,7 @@ function EntryEditor({ article, group, record, multiple, onSave, onClose }) {
           </div>
         ) : (
           <button type="button" className="delete-passage" disabled={busy} onClick={() => setConfirming(true)}>Delete {multiple ? 'passage' : 'entry'}…</button>
-        )}
+        ))}
         <div>
           <button type="button" className="cancel" disabled={busy} onClick={() => dialog.current.close()}>Cancel</button>
           <button type="submit" disabled={busy}>Save correction</button>
@@ -170,7 +173,7 @@ function EditPassage({ article, record, onSave }) {
   return (
     <>
       <button type="button" className="edit-entry" ref={trigger} onClick={() => setEditing(true)}>
-        {multiple ? 'Edit passage' : 'Edit entry'}
+        {group.hasAttribute('data-reference') ? 'Edit transcription' : multiple ? 'Edit passage' : 'Edit entry'}
       </button>
       {editing && createPortal(<EntryEditor article={article} group={group} record={record} multiple={multiple}
         onSave={result => { updatePassage(article, result); onSave(id, result); }}
