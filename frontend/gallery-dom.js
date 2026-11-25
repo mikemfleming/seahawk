@@ -1,7 +1,6 @@
-// Optional enhancements only. Every photograph and transcription is in the HTML.
-const jump = document.getElementById('page-jump');
-const yearJump = document.getElementById('year-jump');
 function syncJump() {
+ const jump=document.getElementById('page-jump');
+ const yearJump=document.getElementById('year-jump');
  const target=hashTarget();
  const page=target?.closest('.log-page');
  jump.value=page?.id||'';
@@ -18,28 +17,31 @@ function scrollAnchor(target){
  return (page.dataset?.readingAnchor&&document.getElementById(page.dataset.readingAnchor))||page;
 }
 function alignHash(){
- const target=hashTarget();if(!target)return;
+ const target=hashTarget();if(!target){syncJump();return;}
  revealTarget(target);
  scrollAnchor(target).scrollIntoView({behavior:'instant',block:'start'});syncJump();
 }
-syncJump();
-window.addEventListener('hashchange',()=>{alignHash();syncJump();});
-// Local editing adds controls asynchronously. Position explicit links only once
-// the initial layout is ready, rather than leaving the native jump behind.
-let initialLinkPending=Boolean(location.hash);
-let pageLoaded=document.readyState==='complete';
-let editorReady=!document.querySelector('script[src="/__local/editor.js"]')||document.documentElement.dataset.editorReady==='true';
-function settleInitialLink(){
- if(!initialLinkPending||!pageLoaded||!editorReady)return;
- requestAnimationFrame(()=>requestAnimationFrame(()=>{
-  if(!initialLinkPending)return;
-  alignHash();initialLinkPending=false;
- }));
+// Align an explicit link after the page and optional local editor are ready.
+export function connectPageLinks(signal){
+ syncJump();
+ window.addEventListener('hashchange',alignHash,{signal});
+ let initialLinkPending=Boolean(location.hash);
+ let pageLoaded=document.readyState==='complete';
+ let editorReady=!document.querySelector('script[src="/__local/editor.js"]')||document.documentElement.dataset.editorReady==='true';
+ function settleInitialLink(){
+  if(!initialLinkPending||!pageLoaded||!editorReady)return;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   if(!initialLinkPending||signal.aborted)return;
+   alignHash();initialLinkPending=false;
+  }));
+ }
+ window.addEventListener('load',()=>{pageLoaded=true;settleInitialLink();},{once:true,signal});
+ document.addEventListener('journal-editor-ready',()=>{editorReady=true;settleInitialLink();},{once:true,signal});
+ for(const event of ['wheel','touchstart','pointerdown','keydown']){
+  window.addEventListener(event,()=>{initialLinkPending=false;},{once:true,passive:true,signal});
+ }
+ settleInitialLink();
 }
-window.addEventListener('load',()=>{pageLoaded=true;settleInitialLink();},{once:true});
-document.addEventListener('journal-editor-ready',()=>{editorReady=true;settleInitialLink();},{once:true});
-for(const event of ['wheel','touchstart','pointerdown','keydown'])window.addEventListener(event,()=>{initialLinkPending=false;},{once:true,passive:true});
-settleInitialLink();
 export function navigateTo(id) {
  const target=document.getElementById(id);if(!target)return;
  revealTarget(target);
@@ -49,7 +51,9 @@ export function navigateTo(id) {
  scrollAnchor(target).scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
  syncJump();
 }
-export function connectGallery(viewer, links, scans) {
+export function connectGallery(viewer, links, scans, signal) {
+  const jump = document.getElementById('page-jump');
+  const yearJump = document.getElementById('year-jump');
   function pageInView() {
     const toolbarBottom = document.querySelector('.page-tools').getBoundingClientRect().bottom;
     const readingLine = Math.max(0, toolbarBottom) + 40;
@@ -72,7 +76,7 @@ export function connectGallery(viewer, links, scans) {
     if (event.repeat) return;
     if (viewer.isOpen()) viewer.close();
     else viewer.open(pageInView());
-  });
+  }, { signal });
 
   for (const [index, link] of links.entries()) {
     link.addEventListener('click', event => {
@@ -80,7 +84,7 @@ export function connectGallery(viewer, links, scans) {
           typeof globalThis.HTMLDialogElement?.prototype.showModal !== 'function') return;
       event.preventDefault();
       viewer.open(index);
-    });
+    }, { signal });
   }
 
   // Stored only in this browser; explicit page links always take precedence.
@@ -103,6 +107,7 @@ export function connectGallery(viewer, links, scans) {
    }
   }
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   if(signal.aborted)return;
    if(!location.hash){
     try{
      const saved=JSON.parse(localStorage.getItem(readingKey)||'null');
@@ -119,9 +124,10 @@ export function connectGallery(viewer, links, scans) {
    saveReadingPosition();
   }));
   let readingTimer;
-  window.addEventListener('scroll',()=>{clearTimeout(readingTimer);readingTimer=setTimeout(saveReadingPosition,200);},{passive:true});
-  window.addEventListener('pagehide',saveReadingPosition);
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveReadingPosition();});
+  window.addEventListener('scroll',()=>{clearTimeout(readingTimer);readingTimer=setTimeout(saveReadingPosition,200);},{passive:true,signal});
+  window.addEventListener('pagehide',saveReadingPosition,{signal});
+  signal.addEventListener('abort',()=>clearTimeout(readingTimer),{once:true});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveReadingPosition();},{signal});
 
   document.addEventListener('click', event => {
     const scan = event.target.closest('a[data-gallery-index]');
@@ -136,7 +142,7 @@ export function connectGallery(viewer, links, scans) {
     const pageId = 'page-' + button.dataset.sourcePage.padStart(3, '0');
     const index = links.findIndex(link => link.closest('.log-page').id === pageId);
     if (index >= 0) viewer.open(index, button);
-  });
+  }, { signal });
 }
 
 export function revealViewerPage(page) {

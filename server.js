@@ -10,7 +10,7 @@ export function createApp({ directory = resolve('dist'), editing = false, correc
   return createServer(async(req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'no-referrer');
-    res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' https://tile.openstreetmap.org; style-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'");
+    res.setHeader('Content-Security-Policy', "default-src 'self'; img-src 'self' https://tile.openstreetmap.org; style-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'");
     if(editor){
       res.setHeader("Content-Security-Policy", "default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'");
       if(await editor(req,res,new URL(req.url,"http://localhost").pathname))return;
@@ -19,7 +19,13 @@ export function createApp({ directory = resolve('dist'), editing = false, correc
     let path;
     try { path = decodeURIComponent(new URL(req.url,'http://localhost').pathname); } catch { res.writeHead(400);res.end('Invalid URL.');return; }
     if (path === '/workspace' || path.startsWith('/workspace/')) { res.writeHead(302,{Location:'/'});res.end();return; }
-    if (path === '/') path = '/index.html';
+    if (['/search','/explore','/search.html','/explore.html'].includes(path)) {
+      const query = new URL(req.url, 'http://localhost').search;
+      res.writeHead(302, { Location: path.replace(/\.html$/, '') + '/' + query });
+      res.end();
+      return;
+    }
+    if (['/','/search/','/explore/'].includes(path)) path += 'index.html';
     const file = resolve(root, '.' + path);
     if (!file.startsWith(root + sep) || !types[extname(file)]) { res.writeHead(404);res.end('Not found.');return; }
     try {

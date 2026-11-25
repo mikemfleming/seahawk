@@ -3,6 +3,7 @@ import {renderPageArtifacts} from './artifacts.js';
 import {formatEntryUpdated} from '../web/entry-updated.js';
 import {weeklyContextHTML} from './render-weekly-context.js';
 import {absorbedSourcePassages,buildJournalModel} from './journal-model.js';
+import {addLogSearch,plainTranscription} from './explore-index.js';
 import {readFileSync} from 'node:fs';
 const entryGroups=JSON.parse(readFileSync(new URL('../content/entry-groups.json',import.meta.url)));
 const escape=value=>String(value??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
@@ -32,7 +33,7 @@ function entryContext(entry,data){
 export function renderContextBlock(page,data){
  return page.entries.map(entry=>entryHeading(entry)+entryContext(entry,data)).join('');
 }
-export function renderEntryContext(html,data,corrections={},grouping=entryGroups,artifacts={items:[]}){
+export function renderEntryContext(html,data,corrections={},grouping=entryGroups,artifacts={items:[]},searchEntries){
  if(!data)return html;
  const model=buildJournalModel(html,data,grouping);
  const absorbed=absorbedSourcePassages(model,grouping,corrections);
@@ -49,6 +50,14 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
   const entry=correctedEntryDate(group,corrections,data);
   const title=entry.date?day(entry.date):'Journal note';
   const year=entry.date?.slice(0,4)||entry.period?.[0]||'';
+  if(searchEntries&&page===firstPage){
+   const text=visible.map(id=>corrections[id]?.text??plainTranscription(model.passages.get(id).html))
+    .join(' ').replace(/\s+/g,' ').trim();
+   if(text)searchEntries.push({
+    id:group.id,title:entry.end_date?title+' – '+day(entry.end_date):title,
+    date:entry.date||'',endDate:entry.end_date||'',year:String(year),pages:readingPages,text
+   });
+  }
   const parts=ids.map(id=>{
    const passage=model.passages.get(id),correction=corrections[id];
    const text=correction?correction.text.split(/\n\s*\n/).map(paragraph=>`<p class="passage">${escape(paragraph)}</p>`).join('\n'):passage.html;
@@ -92,5 +101,5 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
  }
  const options=[...years].sort((a,b)=>a[0]-b[0]).map(([year,id])=>`<option value="${escape(id)}" data-year="${year}">${year}</option>`).join('');
  html=renderPageArtifacts(html,artifacts,model.pages);
- return html.replace('<span class="page-total">',`<label for="year-jump">Year</label><span class="jump-control"><select id="year-jump"><option value="">Choose year</option>${options}</select></span><span class="page-total">`);
+ return addLogSearch(html).replace('<span class="page-total">',`<label for="year-jump">Year</label><span class="jump-control"><select id="year-jump"><option value="">Choose year</option>${options}</select></span><span class="page-total">`);
 }

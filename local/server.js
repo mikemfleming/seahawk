@@ -4,6 +4,7 @@ import {validateArtifact,renderArtifact} from '../scripts/artifacts.js';
 import {readFileSync,writeFileSync,renameSync,existsSync} from 'node:fs';
 import {randomUUID} from 'node:crypto';
 import {resolve} from 'node:path';
+import {writeExploreIndex} from '../scripts/explore-index.js';
 import {renderEntryContext} from '../scripts/render-context.js';
 export function localEditor({correctionsFile=resolve('content/corrections.json'),artifactsFile=resolve('content/artifacts.json'),directory=resolve('dist')}={}){
  const read=()=>JSON.parse(readFileSync(correctionsFile,'utf8'));
@@ -52,9 +53,11 @@ export function localEditor({correctionsFile=resolve('content/corrections.json')
     const now=new Date(Math.max(Date.now(),Date.parse(latestDateCorrection(group,corrections)?.date_updated_at||'1970-01-01')+1)).toISOString();
     record=input.action==='delete'?{deleted:true,updated_at:now,...(corrections[input.id]?.date_override?{date_override:corrections[input.id].date_override,date_updated_at:corrections[input.id].date_updated_at}:{})}:{...corrections[input.id],text:input.text,note:input.note,updated_at:now,...(Object.hasOwn(input,'date_override')?{date_override:{date:input.date_override.date,end_date:input.date_override.end_date},date_updated_at:now}:{})};corrections[input.id]=record;file=correctionsFile;saved=corrections;response=record;
    }
-   const html=renderEntryContext(source,context,corrections,grouping,artifacts);
+   const searchEntries=[];
+   const html=renderEntryContext(source,context,corrections,grouping,artifacts,searchEntries);
    writeFileSync(file+'.tmp',JSON.stringify(saved,null,2)+'\n');renameSync(file+'.tmp',file);
-   writeFileSync(resolve(directory,'index.html'),html);reply(200,response);
+   writeFileSync(resolve(directory,'index.html'),html);
+   writeExploreIndex(directory,searchEntries);reply(200,response);
   }catch{reply(500,{error:'Could not save. Your unsaved text is still in the editor.'});}
   return true;
  };

@@ -31,9 +31,26 @@ test('the Lucky boys clipping has its own section outside the journal pages',()=
  assert.doesNotMatch(html,/id="page-076"|value="page-076"/);
 });
 test('transcriptions and historical data are static, with a local viewer script and no account APIs',()=>{
- assert.doesNotMatch(html,/<form|supabase|\/api\/|log.?in|sign.?in|archivist/i);assert.equal([...html.matchAll(/<script/g)].length,1);assert.match(html,/<script src="gallery.js" type="module"><\/script>/);assert.match(html,/script-src 'self'/);assert(existsSync('dist/gallery.js'));assert.match(html,/connect-src 'none'/);assert.match(html,/Captain Eddie/);
+ assert.doesNotMatch(html,/supabase|\/api\/|log.?in|sign.?in|archivist/i);assert.equal([...html.matchAll(/<script/g)].length,1);assert.match(html,/<script src="gallery.js" type="module"><\/script>/);assert.match(html,/script-src 'self'/);assert(existsSync('dist/gallery.js'));assert.match(html,/connect-src 'none'/);assert.match(html,/Captain Eddie/);
  for(const src of html.matchAll(/(?:src|href)="([^"#]+)"/g)){if(src[1].startsWith('photos/')||src[1]==='style.css')assert(existsSync('dist/'+src[1]),`Missing ${src[1]}`);}
  assert.equal(readdirSync('dist/photos').length,79*3);
+});
+test('search opens the public results page and indexes each complete entry once',async()=>{
+ const form=html.match(/<form[^>]*>[\s\S]*?<\/form>/)?.[0];
+ assert.match(form,/<form role="search" action="search\/" method="get">/);
+ assert.match(form,/<input type="search" id="log-query" name="q"/);
+ assert.match(html,/<a href="explore\/">Browse the logbook index<\/a>/);
+ assert.match(readFileSync('dist/search/index.html','utf8'),/id="explore-root" data-view="search"/);
+ assert(html.indexOf(form)<html.indexOf('id="page-jump"'));
+ assert.equal([...html.matchAll(/<form\b/g)].length,1);
+ const {default:entries}=await import('../dist/explore-data.js');
+ assert.equal(new Set(entries.map(entry=>entry.id)).size,entries.length);
+ for(const entry of entries)assert(html.includes(`id="context-${entry.id}"`));
+ const june=entries.filter(entry=>entry.title==='June 12, 1997');
+ assert.equal(june.length,1);
+ assert.deepEqual(june[0].pages,[28,29]);
+ assert.match(june[0].text,/crab boil/);
+ assert.doesNotMatch(june[0].text,/Billboard Hot 100/);
 });
 test('confirmed names are preserved and only expected scripts are included',()=>{
  assert.match(html,/Bill Hudspeth/);assert(/Lester\s+Ducote/.test(html), 'Confirmed surname retained across line breaks');assert.doesNotMatch(html,/<script(?! src="(?:gallery.js|vendor\/leaflet\/leaflet.js)")/i);

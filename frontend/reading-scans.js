@@ -3,7 +3,7 @@ export function scanTop(stickyTop, start, nextStart, height, gap) {
 }
 
 // The page-order HTML remains the fallback and the source for the photo viewer.
-export function connectReadingScans(links) {
+export function connectReadingScans(links, signal) {
   const desktop = matchMedia('screen and (min-width: 1100px)');
   const photos = new Map(links.map((link, index) => [
     Number(link.closest('.log-page').id.slice(5)), { link, index, page: link.closest('.log-page') },
@@ -167,11 +167,15 @@ export function connectReadingScans(links) {
   }
 
   setLayout();
-  desktop.addEventListener('change', setLayout);
-  window.addEventListener('beforeprint', disable);
-  window.addEventListener('afterprint', setLayout);
-  window.addEventListener('scroll', schedule, { passive: true });
-  window.addEventListener('resize', measure);
+  desktop.addEventListener('change', setLayout, { signal });
+  window.addEventListener('beforeprint', disable, { signal });
+  window.addEventListener('afterprint', setLayout, { signal });
+  window.addEventListener('scroll', schedule, { passive: true, signal });
+  window.addEventListener('resize', measure, { signal });
+  signal.addEventListener('abort', () => {
+    cancelAnimationFrame(frame);
+    disable();
+  }, { once: true });
 
   return {
     pageAt(line) {

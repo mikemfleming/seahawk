@@ -1,9 +1,10 @@
-import { createRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { hydrateRoot } from 'react-dom/client';
 import { mountControl } from './mount.jsx';
 import { connectReadingScans } from './reading-scans.js';
+import { SearchForm } from './search-form.jsx';
 import { PhotoViewer } from './viewer.jsx';
-import { connectGallery, navigateTo, revealViewerPage } from '../web/gallery.js';
+import { connectGallery, connectPageLinks, navigateTo, revealViewerPage } from './gallery-dom.js';
 
 function JumpSelect({ select }) {
   return (
@@ -21,14 +22,28 @@ for (const select of document.querySelectorAll('.jump-control > select')) {
   hydrateRoot(select.parentElement, <JumpSelect select={select} />);
 }
 
-const links = [...document.querySelectorAll('.photograph')];
-const scans = connectReadingScans(links);
-const viewer = createRef();
+const searchSlot = document.getElementById('log-search-root');
+if (searchSlot) hydrateRoot(searchSlot, <SearchForm />);
+
+function JournalReader({ links }) {
+  const viewer = useRef(null);
+
+  useLayoutEffect(() => {
+    const controller = new AbortController();
+    const { signal } = controller;
+    const scans = connectReadingScans(links, signal);
+    connectPageLinks(signal);
+    connectGallery({
+      open: (...args) => viewer.current.open(...args),
+      close: () => viewer.current.close(),
+      isOpen: () => viewer.current.isOpen(),
+      index: () => viewer.current.index(),
+    }, links, scans, signal);
+    return () => controller.abort();
+  }, [links]);
+
+  return <PhotoViewer ref={viewer} links={links} onPageChange={revealViewerPage} />;
+}
+
 mountControl(document.getElementById('photo-viewer-root'),
-  <PhotoViewer ref={viewer} links={links} onPageChange={revealViewerPage} />);
-connectGallery({
-  open: (...args) => viewer.current.open(...args),
-  close: () => viewer.current.close(),
-  isOpen: () => viewer.current.isOpen(),
-  index: () => viewer.current.index(),
-}, links, scans);
+  <JournalReader links={[...document.querySelectorAll('.photograph')]} />);
