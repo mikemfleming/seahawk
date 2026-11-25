@@ -31,8 +31,8 @@ export function localEditor({correctionsFile=resolve('content/corrections.json')
     const existing=input.id?artifacts.items.find(item=>item.id===input.id):null;
     if(input.id&&!existing){reply(404,{error:'Artifact not found.'});return true;}
     if(existing&&existing.page!==input.page){reply(400,{error:'An artifact stays with its source page.'});return true;}
-    const placement=existing?.sourceDimensions?{...(existing.entryId&&{entryId:existing.entryId}),sourceDimensions:existing.sourceDimensions}:{};
-    const error=validateArtifact({...input,entryId:placement.entryId,sourceDimensions:placement.sourceDimensions},model.pages);if(error){reply(400,{error});return true;}
+    const placement=existing?.sourceDimensions?{...(existing.entryId&&{entryId:existing.entryId}),sourceDimensions:existing.sourceDimensions,sourceFile:existing.sourceFile}:{};
+    const error=validateArtifact({...input,entryId:placement.entryId,sourceDimensions:placement.sourceDimensions,sourceFile:placement.sourceFile},model.pages);if(error){reply(400,{error});return true;}
     if((existing?.updated_at||null)!==(input.revision||null)){reply(409,{error:'This artifact changed in another tab. Reload before editing.'});return true;}
     const now=new Date().toISOString();
     record={...placement,id:existing?.id||'A-'+randomUUID(),page:input.page,type:input.type,title:input.title.trim(),caption:input.caption,crop:input.crop,created_at:existing?.created_at||now,updated_at:now};

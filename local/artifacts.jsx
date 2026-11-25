@@ -16,7 +16,7 @@ function ArtifactEditor({ page, record, onClose, onSave }) {
   const [crop, setCrop] = useState(record?.crop ?? null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const number = record?.page ?? Number(page.id.slice(5));
+  const number = record ? record.page : Number(page.id.slice(5));
   useLayoutEffect(() => { dialog.current.showModal(); }, []);
 
   function beginCrop(event) {
@@ -76,11 +76,11 @@ function ArtifactEditor({ page, record, onClose, onSave }) {
       onClose={onClose} onCancel={event => { if (busy) event.preventDefault(); }}>
       <form onSubmit={submit}>
         <h2 id="artifact-editor-title">{record ? 'Edit artifact' : 'Add artifact'}</h2>
-        <p className="artifact-page-label">{record?.entryId ? 'Artifact attached to entry' : record?.sourceDimensions ? 'Loose clipping' : `Page ${number}`}</p>
+        <p className="artifact-page-label">{record?.entryId ? 'Artifact attached to entry' : record?.sourceDimensions ? 'Loose artifact' : `Page ${number}`}</p>
         <p>Drag across the photograph to select an illustration or detail. Leave it unselected to use the whole page.</p>
         <div className="crop-stage" onPointerDown={beginCrop} onPointerMove={moveCrop}
           onPointerUp={finishCrop} onPointerCancel={finishCrop}>
-          <img alt="Original journal page" draggable={false} src={record?.sourceDimensions ? `photos/${String(number).padStart(3, '0')}-large.jpg` : page.querySelector('.photograph img').src} />
+          <img alt="Original journal page" draggable={false} src={record?.sourceFile ? `art/${record.sourceFile}` : record?.sourceDimensions ? `photos/${String(number).padStart(3, '0')}-large.jpg` : page.querySelector('.photograph img').src} />
           <div className="crop-selection" hidden={!crop} style={selectionStyle || undefined} />
         </div>
         <button type="button" className="reset-crop" onClick={() => setCrop(null)}>Use whole page</button>

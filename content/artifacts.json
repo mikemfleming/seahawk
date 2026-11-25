@@ -402,6 +402,36 @@
       "crop": null,
       "created_at": "2026-11-25T15:29:30.477Z",
       "updated_at": "2026-11-25T15:29:30.477Z"
+    },
+    {
+      "id": "A-loose-young-anglers",
+      "page": null,
+      "sourceFile": "young-anglers.jpg",
+      "sourceDimensions": [
+        2048,
+        1536
+      ],
+      "type": "photograph",
+      "title": "Young anglers aboard",
+      "caption": "Two young anglers in life jackets aboard a fishing boat.",
+      "crop": null,
+      "created_at": "2026-11-25T16:11:38.795Z",
+      "updated_at": "2026-11-25T16:11:38.795Z"
+    },
+    {
+      "id": "A-loose-dancing-crab",
+      "page": null,
+      "sourceFile": "dancing-crab.jpg",
+      "sourceDimensions": [
+        2048,
+        1536
+      ],
+      "type": "photograph",
+      "title": "The Dancing Crab",
+      "caption": "A young angler holds up a crab and a handwritten sign. The print is dated March 19, 1994.",
+      "crop": null,
+      "created_at": "2026-11-25T16:11:38.795Z",
+      "updated_at": "2026-11-25T16:11:38.795Z"
     }
   ]
 }

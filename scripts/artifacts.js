@@ -3,7 +3,11 @@ const escape=value=>String(value??'').replaceAll('&','&amp;').replaceAll('<','&l
 export const artifactTypes={illustration:'Illustration',map:'Map or diagram',clipping:'Clipping',photograph:'Photograph',specimen:'Preserved object',other:'Artifact'};
 export function validateArtifact(input,pages){
  if(!input||typeof input!=='object')return 'Invalid artifact data.';
- if(!Number.isInteger(input.page)||(!pages.has(input.page)&&!(Array.isArray(input.sourceDimensions)&&input.sourceDimensions.length===2&&input.sourceDimensions.every(n=>Number.isInteger(n)&&n>0))))return 'Choose an existing photographed page.';
+ const detached=Array.isArray(input.sourceDimensions)&&input.sourceDimensions.length===2&&input.sourceDimensions.every(n=>Number.isInteger(n)&&n>0);
+ const validSourceFile=typeof input.sourceFile==='string'&&/^[a-z0-9-]+\.jpg$/.test(input.sourceFile);
+ if(input.sourceFile!==undefined&&!validSourceFile)return 'Choose a valid artifact photograph.';
+ const standalone=input.page===null&&validSourceFile;
+ if(!(Number.isInteger(input.page)&&(pages.has(input.page)||detached))&&!(standalone&&detached))return 'Choose an existing photographed page.';
  if(!Object.hasOwn(artifactTypes,input.type))return 'Choose an artifact type.';
  if(typeof input.title!=='string'||!input.title.trim()||input.title.length>240)return 'Add a title of up to 240 characters.';
  if(typeof input.caption!=='string'||input.caption.length>10000)return 'Caption must be text of up to 10,000 characters.';
@@ -19,10 +23,12 @@ export function renderArtifact(item,page){
  const width=Number(dimensions[0]),height=Number(dimensions[1]),c=item.crop||{x:0,y:0,width:1,height:1};
  const box=[c.x*width,c.y*height,c.width*width,c.height*height].map(n=>Number(n.toFixed(3))).join(' ');
  const stem=String(item.page).padStart(3,'0');
+ const preview=item.sourceFile?`art/${item.sourceFile}`:`photos/${stem}-large.jpg`;
+ const original=item.sourceFile?preview:`photos/${stem}-full.jpg`;
  const sourceLink=item.sourceDimensions
-  ? `<a class="source-photo" href="photos/${stem}-full.jpg" target="_blank" rel="noopener">View original ${item.type==='clipping'?'clipping':'artifact'} ↗</a>`
+  ? `<a class="source-photo" href="${original}" target="_blank" rel="noopener">View original ${item.type==='clipping'?'clipping':item.type==='photograph'?'photo':'artifact'} ↗</a>`
   : `<button type="button" class="source-photo" data-source-page="${item.page}" aria-label="View original page ${item.page}">View original page ↗</button>`;
- return `<figure class="page-artifact" id="artifact-${escape(item.id)}" data-artifact-id="${escape(item.id)}" data-source-page="${item.page}"><div class="artifact-image"><svg viewBox="${box}" width="${c.width*width}" height="${c.height*height}" role="img" aria-label="${escape(item.title)}" preserveAspectRatio="xMidYMid meet"><image href="photos/${stem}-large.jpg" width="${width}" height="${height}"/></svg></div><figcaption><span class="artifact-type">${escape(artifactTypes[item.type])}${item.sourceDimensions?'':' · Page '+item.page}</span><h3>${escape(item.title)}</h3>${item.caption?`<p class="artifact-caption">${escape(item.caption)}</p>`:''}${sourceLink}<p class="entry-updated">Last updated <time datetime="${escape(item.updated_at)}">${escape(formatEntryUpdated(item.updated_at))}</time></p></figcaption></figure>`;
+ return `<figure class="page-artifact" id="artifact-${escape(item.id)}" data-artifact-id="${escape(item.id)}" data-source-page="${item.page}"><div class="artifact-image"><svg viewBox="${box}" width="${c.width*width}" height="${c.height*height}" role="img" aria-label="${escape(item.title)}" preserveAspectRatio="xMidYMid meet"><image href="${preview}" width="${width}" height="${height}"/></svg></div><figcaption><span class="artifact-type">${escape(artifactTypes[item.type])}${item.sourceDimensions?'':' · Page '+item.page}</span><h3>${escape(item.title)}</h3>${item.caption?`<p class="artifact-caption">${escape(item.caption)}</p>`:''}${sourceLink}<p class="entry-updated">Last updated <time datetime="${escape(item.updated_at)}">${escape(formatEntryUpdated(item.updated_at))}</time></p></figcaption></figure>`;
 }
 export function renderPageArtifacts(html,store,pages){
  const ids=new Set();
