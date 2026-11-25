@@ -221,6 +221,13 @@ function CorrectionProgress({ passages, records }) {
     const { entryId, passageId } = article.dataset;
     pending.set(entryId, pending.get(entryId) || !records[passageId]?.text?.trim());
   }
+  useLayoutEffect(() => {
+    for (const [id, incomplete] of pending) {
+      const badge = document.getElementById('context-' + id)?.querySelector('.entry-corrected');
+      if (badge) badge.hidden = incomplete;
+    }
+  });
+
   const total = pending.size;
   const remaining = [...pending.values()].filter(Boolean).length;
   return (

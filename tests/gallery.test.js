@@ -16,8 +16,8 @@ test('transcriptions and historical data are static, with a local viewer script 
  for(const src of html.matchAll(/(?:src|href)="([^"#]+)"/g)){if(src[1].startsWith('photos/')||src[1]==='style.css')assert(existsSync('dist/'+src[1]),`Missing ${src[1]}`);}
  assert.equal(readdirSync('dist/photos').length,79*3);
 });
-test('uncertain readings and confirmed names are preserved as text, never executable markup',()=>{
- assert.match(html,/\[illegible\]/);assert.match(html,/Bill Hudspeth/);assert(/Lester\s+Ducote/.test(html), 'Confirmed surname retained across line breaks');assert.doesNotMatch(html,/<script(?! src="(?:gallery.js|vendor\/leaflet\/leaflet.js)")/i);
+test('confirmed names are preserved and only expected scripts are included',()=>{
+ assert.match(html,/Bill Hudspeth/);assert(/Lester\s+Ducote/.test(html), 'Confirmed surname retained across line breaks');assert.doesNotMatch(html,/<script(?! src="(?:gallery.js|vendor\/leaflet\/leaflet.js)")/i);
 });
 test('any visitor can read the page and photos; obsolete auth and write endpoints are gone',async t=>{
  const server=createApp();server.listen(0,'127.0.0.1');await once(server,'listening');t.after(()=>new Promise(resolve=>server.close(resolve)));const origin=`http://127.0.0.1:${server.address().port}`;

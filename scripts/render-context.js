@@ -42,6 +42,8 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
  function renderGroup(group,page,ids){
   const visible=visiblePassages.get(group.id);
   const firstPage=model.passages.get(visible[0]).page;
+  const corrected=visible.every(id=>corrections[id]?.text?.trim());
+  const badge=`<span class="entry-corrected"${corrected?'':' hidden'}>Corrected</span>`;
   const lastPage=model.passages.get(visible.at(-1)).page;
   const entry=correctedEntryDate(group,corrections,data);
   const title=entry.date?day(entry.date):'Journal note';
@@ -57,7 +59,7 @@ export function renderEntryContext(html,data,corrections={},grouping=entryGroups
   }).join('\n');
   const latest=group.passageIds.map(id=>corrections[id]?.updated_at).filter(value=>formatEntryUpdated(value)).sort((a,b)=>Date.parse(b)-Date.parse(a))[0];
   const updated=`<p class="entry-updated">${latest?`Last updated <time datetime="${escape(latest)}">${escape(formatEntryUpdated(latest))}</time>`:'Not yet updated'}</p>`;
-  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-entry-date="${escape(entry.date||'')}" data-entry-end-date="${escape(entry.end_date||'')}" data-date-revision="${escape(latestDateCorrection(group,corrections)?.date_updated_at||'')}" data-source-pages="${group.pages.join(',')}" data-passage-count="${visible.length}"${page===firstPage?` id="context-${escape(group.id)}"`:''}>${page===firstPage?entryHeading(entry):`<p class="continuation-reference"><a href="#context-${escape(group.id)}">${escape(title)} ↗</a></p>`}${parts}${page===lastPage?entryContext(entry,data)+updated:''}</article>`;
+  return `<article class="log-entry dated-context" data-year="${year}" data-entry-id="${escape(group.id)}" data-entry-title="${escape(title)}" data-entry-date="${escape(entry.date||'')}" data-entry-end-date="${escape(entry.end_date||'')}" data-date-revision="${escape(latestDateCorrection(group,corrections)?.date_updated_at||'')}" data-source-pages="${group.pages.join(',')}" data-passage-count="${visible.length}"${page===firstPage?` id="context-${escape(group.id)}"`:''}>${page===firstPage?entryHeading(entry)+badge:`<p class="continuation-reference"><a href="#context-${escape(group.id)}">${escape(title)} ↗</a></p>`}${parts}${page===lastPage?entryContext(entry,data)+updated:''}</article>`;
  }
  html=html.replace(/<section class="log-page" id="page-(\d+)"[\s\S]*?<\/section>/g,(section,n)=>{
   const page=model.pages.get(Number(n));
